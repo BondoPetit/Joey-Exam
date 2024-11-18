@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joe & the Juice - Quiz Creator</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <header>
+        <h1>Joe & the Juice - Quiz Creator</h1>
+    </header>
+    <main>
+        <section id="create-quiz">
+            <h2>Create a New Quiz</h2>
+            <form id="quiz-form">
+                <label for="quiz-title">Quiz Title:</label>
+                <input type="text" id="quiz-title" name="quiz-title" required minlength="10" placeholder="Quiz title must be at least 10 characters long">
+                
+                <div id="questions-container">
+                    <h3>Questions</h3>
+                    <div class="question" data-question-id="1">
+                        <label for="question-1">Question 1:</label>
+                        <input type="text" id="question-1" name="question-1" required>
+                        
+                        <label for="answer-1-1">Answer 1:</label>
+                        <input type="text" id="answer-1-1" name="answer-1-1" required>
+                        
+                        <label for="answer-1-2">Answer 2:</label>
+                        <input type="text" id="answer-1-2" name="answer-1-2" required>
+                        
+                        <label for="answer-1-3">Answer 3:</label>
+                        <input type="text" id="answer-1-3" name="answer-1-3" required>
+                        
+                        <label for="correct-answer-1">Correct Answer:</label>
+                        <input type="number" id="correct-answer-1" name="correct-answer-1" min="1" max="3" required>
+                    </div>
+                </div>
+                
+                <button type="button" id="add-question">Add Another Question</button>
+                <button type="submit">Create Quiz</button>
+            </form>
+        </section>
+    </main>
+    <script src="/controllers/main.js"></script>
+</body>
+</html>
