@@ -9,16 +9,29 @@ body {
 }
 
 header {
-    background-color: #ff0066;
-    color: white;
-    padding: 20px 0;
-    text-align: center;
+    background-color: #d387a5b9;
+    color: black;
+    padding: 20px;
+    position: relative;
 }
 
 header h1 {
     margin: 0;
     font-size: 2.5em;
+    text-align: center;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 main {
     padding: 20px;
@@ -34,7 +47,7 @@ section#create-quiz {
 }
 
 section#create-quiz h2 {
-    color: #ff0066;
+    color: black;
     font-size: 2em;
     margin-bottom: 20px;
 }
@@ -60,7 +73,7 @@ form#quiz-form input[type="number"] {
 }
 
 form#quiz-form button {
-    background-color: #ff0066;
+    background-color: #d387a5b9;
     color: white;
     border: none;
     padding: 10px 20px;

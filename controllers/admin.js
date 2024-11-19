@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const quizForm = document.getElementById('quiz-form');
+    if (!quizForm) return;
     const addQuestionButton = document.getElementById('add-question');
+    if (!addQuestionButton) return;
     const questionsContainer = document.getElementById('questions-container');
     let questionCount = 1;
 
@@ -52,6 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         console.log(quizData);
-        // Here you can send the quizData to your server or handle it as needed
+        // Save quiz to local storage so that it can be accessed by employees
+        let quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+        quizzes.push(quizData);
+        localStorage.setItem('quizzes', JSON.stringify(quizzes));
+        console.log('Quiz saved to local storage');
     });
 });

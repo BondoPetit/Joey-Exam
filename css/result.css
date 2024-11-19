@@ -1,0 +1,62 @@
+/* results.css */
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+header {
+    background-color: #d387a5b9;
+    color: black;
+    padding: 20px 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: 600;
+}
+
+main {
+    padding: 20px;
+}
+
+section#results-section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+section#results-section h2 {
+    color: black;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.result {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.result h3 {
+    margin-top: 0;
+    color: #ff0066;
+}
+
+.result p {
+    margin: 5px 0;
+}
+
+.result .answer {
+    margin-left: 20px;
+}
