@@ -1,4 +1,14 @@
+/*logo */
 
+#corner-logo {
+    position: fixed;  /* Gør, at billedet forbliver på plads selv når der scrolles */
+    top: 0px;        /* Placer billedet 20px fra toppen af skærmen */
+    right: 20px;      /* Placer billedet 20px fra højre side af skærmen */
+    width: 100px;     /* Angiv en passende størrelse til billedet */
+    z-index: 5000;    /* Sørger for, at billedet ligger øverst i forhold til andre elementer */
+}
+
+/* employee */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
@@ -8,7 +18,7 @@ body {
 }
 
 header {
-    background-color: #d387a5b9;
+    background-color: #dd97b3b0;
     color: black;
     padding: 20px 0;
     text-align: center;

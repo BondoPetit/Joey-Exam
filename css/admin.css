@@ -23,7 +23,7 @@ body {
 }
 
 header {
-    background-color: #d387a5b9;
+    background-color: #dd97b3b0;
     color: black;
     padding: 20px;
     position: relative;
@@ -87,7 +87,7 @@ form#quiz-form input[type="number"] {
 }
 
 form#quiz-form button {
-    background-color: #d387a5b9;
+    background-color: #d387a5ef;
     color: white;
     border: none;
     padding: 10px 20px;
