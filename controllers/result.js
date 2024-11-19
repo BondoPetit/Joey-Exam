@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const resultsList = document.getElementById('results-list');
 
-    // Simulate fetching quiz results from local storage
+    // Fetch quiz results from local storage
     const quizResults = JSON.parse(localStorage.getItem('quizResults')) || [];
 
     if (quizResults.length === 0) {
@@ -16,14 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             result.questions.forEach((question, qIndex) => {
-                const questionPara = document.createElement('p');
-                questionPara.innerHTML = `<strong>Question ${qIndex + 1}: ${question.text}</strong>`;
-                resultDiv.appendChild(questionPara);
-
-                const answerPara = document.createElement('p');
-                answerPara.classList.add('answer');
-                answerPara.innerHTML = `Answer: ${question.employeeAnswer}`;
-                resultDiv.appendChild(answerPara);
+                const questionBlock = document.createElement('div');
+                questionBlock.classList.add('question-block');
+                questionBlock.innerHTML = `
+                    <p><strong>Question ${qIndex + 1}: ${question.text}</strong></p>
+                    <p class="answer"><strong>Employee's Answer:</strong> ${question.employeeAnswer}</p>
+                    <p class="correct-answer"><strong>Correct Answer:</strong> ${question.correctAnswer}</p>
+                `;
+                resultDiv.appendChild(questionBlock);
             });
 
             resultsList.appendChild(resultDiv);

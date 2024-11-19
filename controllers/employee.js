@@ -48,8 +48,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const submitButton = document.createElement('button');
         submitButton.textContent = 'Submit Quiz';
         submitButton.onclick = () => {
-            alert('Quiz submitted!');
-            // Add functionality to handle quiz results if needed
+            // Gather results from the quiz
+            const employeeAnswers = [];
+            quiz.questions.forEach((question, qIndex) => {
+                const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
+                employeeAnswers.push({
+                    text: question.text,
+                    employeeAnswer: selectedAnswer ? selectedAnswer.value : "No answer",
+                    correctAnswer: question.correctAnswer
+                });
+            });
+
+            // Create result object
+            const result = {
+                title: quiz.title,
+                employeeId: `EMP${Math.floor(Math.random() * 1000)}`, // Dummy employee ID, replace with actual ID if available
+                questions: employeeAnswers
+            };
+
+            // Store result in local storage
+            const quizResults = JSON.parse(localStorage.getItem('quizResults')) || [];
+            quizResults.push(result);
+            localStorage.setItem('quizResults', JSON.stringify(quizResults));
+
+            alert('Quiz submitted successfully!');
+            quizList.innerHTML = ''; // Clear quiz list or redirect user as needed
         };
         quizContainer.appendChild(submitButton);
 
