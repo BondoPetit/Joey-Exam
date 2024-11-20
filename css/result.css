@@ -60,7 +60,8 @@ section#results-section h2 {
 
 .result h3 {
     margin-top: 0;
-    color: #ff0066;
+    color: black;
+    font-size: 22px;
 }
 
 .result p {
