@@ -8,6 +8,9 @@ app.get('/', (req, res) => {
   res.redirect('http://localhost:3000/Static/views/start.html');
 });
 
+
+app.use(express.static(path.join(__dirname, 'static')));
+
 app.get('/static/*', function (req, res) {
     res.sendFile(path.join(__dirname, req.url));
 });
