@@ -5,7 +5,7 @@ const PORT = 3000;
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.redirect('http://localhost:3000/views/employee-login.html');
+  res.redirect('http://localhost:3000/Static/views/employee-login.html');
 });
 
 app.get('/static/*', function (req, res) {
