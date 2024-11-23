@@ -14,7 +14,7 @@ router.post('/save', async (req, res) => {
 
     try {
         const pool = await getPool();
-        const transaction = new sql.Transaction(pool);
+        const transaction = new sql.Transaction(pool); // Initialize transaction
         await transaction.begin();
 
         // Insert quiz into the Quizzes table
@@ -66,6 +66,12 @@ router.post('/save', async (req, res) => {
         res.status(201).json({ message: 'Quiz saved successfully.' });
     } catch (err) {
         console.error('Error saving quiz:', err.message);
+        try {
+            await transaction.rollback();
+            console.error('Transaction rolled back due to an error.');
+        } catch (rollbackError) {
+            console.error('Error rolling back transaction:', rollbackError.message);
+        }
         res.status(500).json({ error: 'An error occurred while saving the quiz.' });
     }
 });

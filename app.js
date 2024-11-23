@@ -9,6 +9,7 @@ const PORT = 3000;
 // Import controllers for application functionalities
 const admin_login = require('./Static/controllers/admin_login'); // Importer admin login controller
 const employee_login = require('./Static/controllers/employee_login');
+const quiz_controller = require('./Static/controllers/quiz_controller'); // Importer quiz controller
 const { getPool } = require('./database');
 
 // Middleware setup
@@ -71,7 +72,8 @@ app.get('/Static/views/result.html', (req, res) => {
 
 // Brug controllers til at håndtere login-ruter
 app.use('/admin_login', admin_login);
-app.use('/employee_login', employee_login); 
+app.use('/employee_login', employee_login);
+app.use('/quiz', quiz_controller); // Brug quiz controlleren 
 
 // Tilføj logning for at spore anmodninger til admin_login ruten
 app.post('/admin_login/login', (req, res, next) => {
