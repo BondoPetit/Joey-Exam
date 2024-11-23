@@ -5,8 +5,8 @@ const app = express();
 const PORT = 3000;
 
 // Import controllers for application functionalities
-const admin_login = require('./Static/controllers/admin_login'); // Importer admin login controller
-const employee_login = require('./Static/controllers/employee_login');
+const admin_login = require('./controllers/admin_login'); // Importer admin login controller
+const employee_login = require('./controllers/employee_login');
 const { getPool } = require('./database');
 
 // Middleware setup
@@ -21,17 +21,17 @@ app.use(cors({
 }));
 
 // Serve static files
-app.use('/static/public', express.static(path.join(__dirname, 'Static/public')));
-app.use('/views', express.static(path.join(__dirname, 'Static/views')));
+app.use('/static/public', express.static(path.join(__dirname, 'public')));
+app.use('/views', express.static(path.join(__dirname, 'views')));
 
 // Route to serve the start page at the root URL
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Static', 'views', 'start.html'));
+  res.sendFile(path.join(__dirname, 'views', 'start.html'));
 });
 
 // Route to serve admin.html directly
 app.get('/views/admin.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'Static', 'views', 'admin.html'));
+    res.sendFile(path.join(__dirname, 'views', 'admin.html'));
 });
 
 // Brug controllers til at håndtere login-ruter
