@@ -20,7 +20,7 @@ app.use(cors({
 }));
 
 // Serve static files
-app.use('/Static/public', express.static(path.join(__dirname, 'Static/public')));
+app.use('/static/public', express.static(path.join(__dirname, 'Static/public')));
 app.use('/views', express.static(path.join(__dirname, 'Static/views')));
 
 // Route to serve the start page at the root URL
@@ -30,6 +30,7 @@ app.get('/', (req, res) => {
 
 app.use('/employee_login', employee_login); // Handles employee login-related routes
 
+// Test database connection on startup
 async function checkDatabaseConnection() {
   try {
       const pool = await getPool();
@@ -39,7 +40,6 @@ async function checkDatabaseConnection() {
       console.error('Error connecting to the database:', err.message);
   }
 }
-
 checkDatabaseConnection();
 
 // Start the server

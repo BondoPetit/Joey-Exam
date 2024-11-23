@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // Send POST request til serveren for at registrere medarbejderen
-                const response = await fetch('http://localhost:3000/employee_login/register', { // Opdater URL
+                const response = await fetch('/employee_login/register', { // Brug relativ sti
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
