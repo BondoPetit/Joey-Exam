@@ -5,6 +5,7 @@ const app = express();
 const PORT = 3000;
 
 // Import controllers for application functionalities
+const admin_login = require('./Static/controllers/admin_login'); // Importer admin login controller
 const employee_login = require('./Static/controllers/employee_login');
 const { getPool } = require('./database');
 
@@ -27,7 +28,7 @@ app.use('/views', express.static(path.join(__dirname, 'Static/views')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'Static', 'views', 'start.html'));
 });
-
+app.use('/admin_login', admin_login); // Tilføj route til admin login
 app.use('/employee_login', employee_login); // Handles employee login-related routes
 
 // Test database connection on startup
