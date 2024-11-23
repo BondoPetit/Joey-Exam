@@ -28,11 +28,16 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials.' });
         }
 
-        const { AdminID, PasswordHash: hashedPassword } = result.recordset[0];
+        const { PasswordHash: hashedPassword } = result.recordset[0];
         const isPasswordValid = await bcrypt.compare(password, hashedPassword);
 
         if (isPasswordValid) {
-            res.status(200).json({ redirectUrl: '/views/admin.html' });
+            console.log('Login successful for user:', username);
+            // Send redirect URL til admin.html
+            res.status(200).json({ 
+                message: 'Login successful',
+                redirectUrl: '/views/admin.html'
+            });
         } else {
             console.error('Login failed: Invalid password for username:', username);
             res.status(401).json({ error: 'Invalid credentials.' });

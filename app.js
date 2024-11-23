@@ -28,8 +28,15 @@ app.use('/views', express.static(path.join(__dirname, 'Static/views')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'Static', 'views', 'start.html'));
 });
-app.use('/admin_login', admin_login); // Tilføj route til admin login
-app.use('/employee_login', employee_login); // Handles employee login-related routes
+
+// Route to serve admin.html directly
+app.get('/views/admin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Static', 'views', 'admin.html'));
+});
+
+// Brug controllers til at håndtere login-ruter
+app.use('/admin_login', admin_login);
+app.use('/employee_login', employee_login); 
 
 // Test database connection on startup
 async function checkDatabaseConnection() {
