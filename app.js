@@ -38,6 +38,12 @@ app.get('/views/admin.html', (req, res) => {
 app.use('/admin_login', admin_login);
 app.use('/employee_login', employee_login); 
 
+// Tilføj logning for at spore anmodninger til admin_login ruten
+app.post('/admin_login/login', (req, res, next) => {
+    console.log('Received POST request to /admin_login/login');
+    next();
+});
+
 // Test database connection on startup
 async function checkDatabaseConnection() {
   try {

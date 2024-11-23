@@ -7,8 +7,10 @@ const { getPool } = require('../../database');
 
 // Route for handling admin login
 router.post('/login', async (req, res) => {
+    console.log('Received POST request to /admin_login/login'); // Log to verify request receipt
     const { username, password } = req.body;
     if (!username || !password) {
+        console.log('Missing username or password'); // Log to clarify missing fields
         return res.status(400).json({ error: 'Username and password are required.' });
     }
     try {
@@ -30,6 +32,7 @@ router.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, hashedPassword);
         
         if (isPasswordValid) {
+            console.log('Login successful for user:', username); // Log successful login
             res.status(200).json({ 
                 message: 'Login successful',
                 adminID: AdminID, // Send AdminID back to the client if needed

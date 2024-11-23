@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('password').value;
 
             try {
+                console.log('Attempting to send login request with:', { username, password });
+
                 // Send en POST-anmodning til serveren for login
                 const response = await fetch('/admin_login/login', {
                     method: 'POST',
@@ -16,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ username, password }),
+                    cache: 'no-store',
                 });
 
                 if (response.ok) {
@@ -24,11 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log('Redirecting to:', result.redirectUrl);
                         window.location.href = result.redirectUrl; // Redirect til admin siden
                     } else {
+                        console.warn('No redirect URL provided in response.');
                         alert('No redirect URL provided in response.');
                     }
                 } else {
                     // Håndter fejl ved login
                     const errorData = await response.json();
+                    console.error('Login failed:', errorData);
                     alert(errorData.error || 'Invalid credentials.');
                 }
             } catch (error) {
@@ -38,3 +43,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
