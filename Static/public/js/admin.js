@@ -1,3 +1,4 @@
+// This script listens for the DOMContentLoaded event, and initializes the quiz functionality.
 document.addEventListener('DOMContentLoaded', () => {
     const quizForm = document.getElementById('quiz-form');
     if (!quizForm) return;
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         questionsContainer.appendChild(questionDiv);
     });
 
-    quizForm.addEventListener('submit', (event) => {
+    quizForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const formData = new FormData(quizForm);
         const quizData = {};
@@ -54,10 +55,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         console.log(quizData);
-        // Save quiz to local storage so that it can be accessed by employees
-        let quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
-        quizzes.push(quizData);
-        localStorage.setItem('quizzes', JSON.stringify(quizzes));
-        console.log('Quiz saved to local storage');
+        
+        // Send quiz data to the backend to save in the database
+        try {
+            const response = await fetch('/quiz/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(quizData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Quiz saved to database:', result.message);
+                alert('Quiz saved successfully.');
+            } else {
+                const error = await response.json();
+                console.error('Error saving quiz:', error.error);
+                alert('Error saving quiz: ' + error.error);
+            }
+        } catch (err) {
+            console.error('Error during quiz save request:', err);
+            alert('An error occurred while saving the quiz.');
+        }
     });
 });

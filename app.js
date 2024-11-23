@@ -92,7 +92,7 @@ async function checkDatabaseConnection() {
 checkDatabaseConnection();
 
 // Function to add a new admin user
-async function addAdminUser() {
+/*async function addAdminUser() {
     try {
         // Hash passwordet
         const plainPassword = '1234';
@@ -114,6 +114,7 @@ async function addAdminUser() {
     }
 }
 addAdminUser();
+*/
 
 // Start the server
 app.listen(PORT, () => {
