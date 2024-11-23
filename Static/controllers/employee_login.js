@@ -28,7 +28,7 @@ router.post('/register', async (req, res) => {
             throw new Error('Failed to register employee.');
         }
 
-        res.status(200).json({ redirectUrl: '/views/employee.html' });
+        res.status(200).json({ redirectUrl: '/static/views/employee.html' });
     } catch (err) {
         console.error('Error registering employee:', err.message);
         res.status(500).json({ error: 'An error occurred while registering user.' });
@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, hashedPassword);
         
         if (isPasswordValid) {
-            res.status(200).json({ redirectUrl: '/views/employee.html' }); // Updated redirect URL
+            res.status(200).json({ redirectUrl: '/static/views/employee.html' }); // Updated redirect URL
         } else {
             console.error('Login failed: Invalid password for email:', email);
             res.status(401).json({ error: 'Invalid employee credentials.' });

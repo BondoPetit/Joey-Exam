@@ -22,19 +22,52 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'], // Tillad specifikke headers
 }));
 
-// Serve static files
-app.use('/static/public', express.static(path.join(__dirname, 'public')));
-app.use('/views', express.static(path.join(__dirname, 'views')));
+// Serve static files from Static directory
+app.use('/Static', express.static(path.join(__dirname, 'Static')));
 
 // Route to serve the start page at the root URL
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'start.html'));
+  const filePath = path.resolve(__dirname, 'Static/views/start.html');
+  console.log('Serving file from:', filePath);
+  res.sendFile(filePath);
 });
+
+// Route to serve employee_login.html directly
+app.get('/Static/views/employee_login.html', (req, res) => {
+  const filePath = path.resolve(__dirname, 'Static/views/employee_login.html');
+  console.log('Serving file from:', filePath);
+  res.sendFile(filePath);
+});
+
+// Route to serve employee_register.html directly
+app.get('/Static/views/employee_register.html', (req, res) => {
+  const filePath = path.resolve(__dirname, 'Static/views/employee_register.html');
+  console.log('Serving file from:', filePath);
+  res.sendFile(filePath);
+});
+
+// Route to serve employee.html directly
+app.get('/Static/views/employee.html', (req, res) => {
+  const filePath = path.resolve(__dirname, 'Static/views/employee.html');
+  console.log('Serving file from:', filePath);
+  res.sendFile(filePath);
+});
+
 
 // Route to serve admin.html directly
 app.get('/views/admin.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+    const filePath = path.resolve(__dirname, 'Static/views', 'admin.html');
+    console.log('Serving file from:', filePath);
+    res.sendFile(filePath);
 });
+
+// Route to serve result.html directly
+app.get('/Static/views/result.html', (req, res) => {
+  const filePath = path.resolve(__dirname, 'Static/views/result.html');
+  console.log('Serving file from:', filePath);
+  res.sendFile(filePath);
+});
+
 
 // Brug controllers til at håndtere login-ruter
 app.use('/admin_login', admin_login);

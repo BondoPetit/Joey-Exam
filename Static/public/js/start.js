@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const teamplayerButton = document.getElementById('teamplayer-button');
 
     coachButton.addEventListener('click', () => {
-        window.location.href = '/views/admin_login.html';
+        window.location.href = '/static/views/admin_login.html';
     });
 
     teamplayerButton.addEventListener('click', () => {
-    window.location.href = '/views/employee_login.html';
+    window.location.href = '/static/views/employee_login.html';
 });
 });
