@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 const { getPool } = require('../../database');
 
-
 // Route for handling employee registration
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
@@ -29,7 +28,7 @@ router.post('/register', async (req, res) => {
             throw new Error('Failed to register employee.');
         }
 
-        res.status(200).json({ redirectUrl: '/Static/views/employee.html' });
+        res.status(200).json({ redirectUrl: '/views/employee.html' });
     } catch (err) {
         console.error('Error registering employee:', err.message);
         res.status(500).json({ error: 'An error occurred while registering user.' });
@@ -54,17 +53,17 @@ router.post('/login', async (req, res) => {
         
         if (result.recordset.length === 0) {
             console.error('Login failed: No matching user found for email:', email);
-            return res.status(401).json({ message: 'Invalid employee credentials.' });
+            return res.status(401).json({ error: 'Invalid employee credentials.' });
         }
         
         const { EmployeeID, EmployeePassword: hashedPassword } = result.recordset[0];
         const isPasswordValid = await bcrypt.compare(password, hashedPassword);
         
         if (isPasswordValid) {
-            res.status(200).json({ redirectUrl: '/Static/views/employee.html' });
+            res.status(200).json({ redirectUrl: '/views/employee.html' }); // Updated redirect URL
         } else {
             console.error('Login failed: Invalid password for email:', email);
-            res.status(401).json({ message: 'Invalid employee credentials.' });
+            res.status(401).json({ error: 'Invalid employee credentials.' });
         }
     } catch (err) {
         console.error('Error logging in employee:', err.message);

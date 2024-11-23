@@ -1,50 +1,27 @@
-// Import the mssql module to interact with Microsoft SQL Server
+require('dotenv').config({ path: 'DB.env' }); // Sørg for at denne står øverst!
 const sql = require('mssql');
-require('dotenv').config(); // Load environment variables
 
-// Database configuration containing server address, database name, user credentials, and encryption options
 const config = {
     server: process.env.DB_SERVER,
     database: process.env.DB_DATABASE,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     options: {
-        encrypt: true // Enable encryption for secure communication
+        encrypt: process.env.DB_ENCRYPT === 'true' // Husk at sammenligne som streng
     }
 };
 
-let pool; // Declare a variable to store the connection pool
+let pool;
 
-// Function to get the connection pool asynchronously
 async function getPool() {
-    try {
-        // If connection pool doesn't exist, create a new one and return it
-        if (!pool) {
-            pool = await sql.connect(config);
-            console.log('Database connection established successfully.');
-        }
-    } catch (err) {
-        console.error('Error connecting to the database:', err.message);
-        throw err; // Re-throw error for further handling
+    if (!pool) {
+        pool = await sql.connect(config);
     }
     return pool;
 }
 
-// Function to close the connection pool
-async function closePool() {
-    try {
-        if (pool) {
-            await pool.close();
-            console.log('Database connection closed.');
-            pool = null;
-        }
-    } catch (err) {
-        console.error('Error closing the database connection:', err.message);
-    }
-}
+console.log('DB_SERVER:', process.env.DB_SERVER); // Debugging: Se hvad der sker
 
-// Export the getPool and closePool functions to make them accessible from other modules
 module.exports = {
     getPool,
-    closePool,
 };

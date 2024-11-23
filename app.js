@@ -24,6 +24,17 @@ app.get('/', (req, res) => {
 
 app.use('/employee_login', employee_login); // Handles employee login-related routes
 
+async function checkDatabaseConnection() {
+  try {
+      const pool = await getPool();
+      await pool.request().query('SELECT 1 AS isConnected');
+      console.log('Database connection successful!');
+  } catch (err) {
+      console.error('Error connecting to the database:', err.message);
+  }
+}
+
+checkDatabaseConnection();
 
 // Start the server
 app.listen(PORT, () => {
