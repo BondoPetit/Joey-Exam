@@ -5,7 +5,9 @@ const router = express.Router();
 const { getPool } = require('../../../database');
 
 // Route for fetching all quizzes for employees
+console.log('GET /employee/get route called');
 router.get('/get', async (req, res) => {
+    console.log('Fetching quizzes...');
     try {
         const pool = await getPool();
         const quizzesResult = await pool.request().query(`
@@ -53,7 +55,9 @@ router.get('/get', async (req, res) => {
 });
 
 // Route for saving employee quiz answers
+console.log('POST /employee/submit route called');
 router.post('/submit', async (req, res) => {
+    console.log('Saving quiz answers...');
     const { title, employeeId, questions } = req.body;
 
     if (!title || !employeeId || !questions || !Array.isArray(questions)) {

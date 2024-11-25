@@ -73,7 +73,10 @@ app.get('/Static/views/result.html', (req, res) => {
 app.use('/admin_login', admin_login);
 app.use('/employee_login', employee_login);
 app.use('/quiz', quiz_controller); // Brug quiz controlleren
-app.use('/employee', employee_controller); // Brug employee controlleren
+app.use('/employee', (req, res, next) => {
+    console.log('Employee route hit:', req.method, req.originalUrl);
+    next();
+}, employee_controller); // Brug employee controlleren
 
 // Tilføj logning for at spore anmodninger til admin_login ruten
 app.post('/admin_login/login', (req, res, next) => {

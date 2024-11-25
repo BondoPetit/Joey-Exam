@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         // Fetch quizzes from the server
-        const response = await fetch('/employee/get');
+        const response = await fetch('https://joe-and-the-juice.engineer/employee/get');
         if (!response.ok) {
             throw new Error('Failed to fetch quizzes from the server');
         }
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to handle quiz taking
     window.startQuiz = async function (quizIndex) {
         try {
-            const response = await fetch(`/employee/get/${quizIndex}`);
+            const response = await fetch(`https://joe-and-the-juice.engineer/employee/get/${quizIndex}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch quiz details from the server');
             }
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // Send the result to the server to save in the database
                 try {
-                    const response = await fetch('/employee/submit', {
+                    const response = await fetch('https://joe-and-the-juice.engineer/employee/submit', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
