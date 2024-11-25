@@ -10,6 +10,7 @@ const PORT = 3000;
 const admin_login = require('./Static/controllers/admin_login'); // Importer admin login controller
 const employee_login = require('./Static/controllers/employee_login');
 const quiz_controller = require('./Static/controllers/quiz_controller'); // Importer quiz controller
+const employee_controller = require('./Static/controllers/employee_controller'); // Importer employee controller
 const { getPool } = require('./database');
 
 // Middleware setup
@@ -18,7 +19,7 @@ app.use(express.json());
 
 // Brug CORS middleware for at tillade anmodninger fra bestemte domæner
 app.use(cors({
-    origin: ['https://joe-and-the-juice.engineer'], // Tillad kun dette domæne at lave anmodninger
+    origin: ['http://127.0.0.1:5500', 'https://joe-and-the-juice.engineer'], // Tillad lokalt udviklingsdomæne og produktionsdomæne
     methods: ['GET', 'POST'], // Tillad kun GET og POST anmodninger
     allowedHeaders: ['Content-Type', 'Authorization'], // Tillad specifikke headers
 }));
@@ -54,7 +55,6 @@ app.get('/Static/views/employee.html', (req, res) => {
   res.sendFile(filePath);
 });
 
-
 // Route to serve admin.html directly
 app.get('/views/admin.html', (req, res) => {
     const filePath = path.resolve(__dirname, 'Static/views', 'admin.html');
@@ -69,11 +69,11 @@ app.get('/Static/views/result.html', (req, res) => {
   res.sendFile(filePath);
 });
 
-
 // Brug controllers til at håndtere login-ruter
 app.use('/admin_login', admin_login);
 app.use('/employee_login', employee_login);
-app.use('/quiz', quiz_controller); // Brug quiz controlleren 
+app.use('/quiz', quiz_controller); // Brug quiz controlleren
+app.use('/employee', employee_controller); // Brug employee controlleren
 
 // Tilføj logning for at spore anmodninger til admin_login ruten
 app.post('/admin_login/login', (req, res, next) => {
@@ -92,31 +92,6 @@ async function checkDatabaseConnection() {
   }
 }
 checkDatabaseConnection();
-
-// Function to add a new admin user
-/*async function addAdminUser() {
-    try {
-        // Hash passwordet
-        const plainPassword = '1234';
-        const hashedPassword = await bcrypt.hash(plainPassword, 10);
-
-        // Forbind til databasen og indsæt admin bruger
-        const pool = await getPool();
-        await pool.request()
-            .input('username', sql.NVarChar, 'Bondo')
-            .input('passwordHash', sql.NVarChar, hashedPassword)
-            .query(`
-                INSERT INTO Admins (Username, PasswordHash)
-                VALUES (@username, @passwordHash)
-            `);
-
-        console.log('Admin user "Bondo" added successfully.');
-    } catch (error) {
-        console.error('Error adding admin user:', error.message);
-    }
-}
-addAdminUser();
-*/
 
 // Start the server
 app.listen(PORT, () => {
