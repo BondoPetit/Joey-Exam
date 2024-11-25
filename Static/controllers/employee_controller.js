@@ -2,7 +2,7 @@
 const express = require('express');
 const sql = require('mssql');
 const router = express.Router();
-const { getPool } = require('../../../database');
+const { getPool } = require('../../database');
 
 // Route for fetching all quizzes for employees
 console.log('GET /employee/get route called');

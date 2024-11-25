@@ -19,9 +19,10 @@ app.use(express.json());
 
 // Brug CORS middleware for at tillade anmodninger fra bestemte domæner
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'https://joe-and-the-juice.engineer'], // Tillad lokalt udviklingsdomæne og produktionsdomæne
+    origin: ['http://127.0.0.1:5500', 'https://joe-and-the-juice.engineer', 'http://localhost:3000'], // Tillad lokalt udviklingsdomæne og produktionsdomæne, inkl. http://localhost:3000
     methods: ['GET', 'POST'], // Tillad kun GET og POST anmodninger
     allowedHeaders: ['Content-Type', 'Authorization'], // Tillad specifikke headers
+    credentials: true // Tillad autoriseringsoplysninger og cookies
 }));
 
 // Serve static files from Static directory
