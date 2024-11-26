@@ -10,52 +10,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const quizResults = await response.json();
 
-        if (quizResults.length === 0) {
+        // Add check to ensure quizResults is an array
+        if (!Array.isArray(quizResults) || quizResults.length === 0) {
             resultsList.innerHTML = '<p>No quiz results available at the moment.</p>';
-        } else {
-            quizResults.forEach((quiz, index) => {
-                const quizDiv = document.createElement('div');
-                quizDiv.classList.add('quiz-result');
-                quizDiv.innerHTML = `
-                    <h3>Quiz: ${quiz.title}</h3>
-                    <button class="toggle-results-button">Show Employee Answers</button>
-                    <div class="quiz-results hidden"></div>
+            return;
+        }
+
+        quizResults.forEach((quiz, index) => {
+            // Check if quiz and its properties are defined
+            if (!quiz || !quiz.title || !Array.isArray(quiz.employeeSummaries)) {
+                console.warn(`Quiz data is missing or incorrect at index ${index}`);
+                return;
+            }
+
+            const quizDiv = document.createElement('div');
+            quizDiv.classList.add('quiz-result');
+            quizDiv.innerHTML = `
+                <h3>Quiz: ${quiz.title}</h3>
+                <button class="toggle-results-button">Show Employee Answers</button>
+                <div class="quiz-results hidden"></div>
+            `;
+
+            const resultsContainer = quizDiv.querySelector('.quiz-results');
+            quiz.employeeSummaries.forEach((result) => {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('employee-summary');
+                resultDiv.innerHTML = `
+                    <p><strong>Submitted by Employee ID:</strong> ${result.employeeId}</p>
+                    <p><strong>Incorrect Answers Count:</strong> ${result.incorrectCount}</p>
                 `;
 
-                const resultsContainer = quizDiv.querySelector('.quiz-results');
-                quiz.results.forEach((result) => {
-                    const resultDiv = document.createElement('div');
-                    resultDiv.classList.add('result');
-                    resultDiv.innerHTML = `
-                        <p><strong>Submitted by Employee ID:</strong> ${result.employeeId}</p>
-                        <p><strong>Incorrect Answers Count:</strong> ${result.incorrectCount}</p>
-                    `;
-
-                    result.questions.forEach((question, qIndex) => {
-                        const questionBlock = document.createElement('div');
-                        questionBlock.classList.add('question-block');
-                        questionBlock.innerHTML = `
-                            <p><strong>Question ${qIndex + 1}: ${question.text}</strong></p>
-                            <p class="answer"><strong>Employee's Answer:</strong> ${question.employeeAnswer}</p>
-                            <p class="correct-answer"><strong>Correct Answer:</strong> ${question.correctAnswer}</p>
-                            <p class="${question.isCorrect ? 'correct' : 'incorrect'}">${question.isCorrect ? 'Correct' : 'Incorrect'}</p>
-                        `;
-                        questionBlock.classList.add('hidden'); // Initially hide question details
-                        resultDiv.appendChild(questionBlock);
-                    });
-
-                    resultsContainer.appendChild(resultDiv);
-                });
-
-                const toggleButton = quizDiv.querySelector('.toggle-results-button');
-                toggleButton.addEventListener('click', () => {
-                    resultsContainer.classList.toggle('hidden');
-                    toggleButton.textContent = resultsContainer.classList.contains('hidden') ? 'Show Employee Answers' : 'Hide Employee Answers';
-                });
-
-                resultsList.appendChild(quizDiv);
+                resultsContainer.appendChild(resultDiv);
             });
-        }
+
+            const toggleButton = quizDiv.querySelector('.toggle-results-button');
+            toggleButton.addEventListener('click', () => {
+                resultsContainer.classList.toggle('hidden');
+                toggleButton.textContent = resultsContainer.classList.contains('hidden') ? 'Show Employee Answers' : 'Hide Employee Answers';
+            });
+
+            resultsList.appendChild(quizDiv);
+        });
     } catch (error) {
         console.error('Error fetching quiz results:', error);
         resultsList.innerHTML = '<p>Error fetching quiz results. Please try again later.</p>';
