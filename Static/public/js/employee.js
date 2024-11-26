@@ -58,28 +58,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     answerLabel.append(` ${answer.text}`);
                     questionDiv.appendChild(answerLabel);
                     questionDiv.appendChild(document.createElement('br'));
-
-                    // Add event listener to handle feedback on answer selection
-                    answerInput.addEventListener('change', () => {
-                        const isCorrect = answer.isCorrect;
-                        const feedbackDiv = document.createElement('div');
-                        feedbackDiv.classList.add('feedback');
-
-                        if (isCorrect) {
-                            feedbackDiv.classList.add('correct');
-                            feedbackDiv.innerText = 'Correct!';
-                        } else {
-                            feedbackDiv.classList.add('incorrect');
-                            feedbackDiv.innerText = 'Incorrect!';
-                        }
-
-                        questionDiv.appendChild(feedbackDiv);
-
-                        // Remove the feedback after 2 seconds
-                        setTimeout(() => {
-                            questionDiv.removeChild(feedbackDiv);
-                        }, 2000);
-                    });
                 });
                 quizContainer.appendChild(questionDiv);
             });
@@ -123,6 +101,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
 
                     if (response.ok) {
+                        // Show feedback after submission
+                        quiz.questions.forEach((question, qIndex) => {
+                            const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
+                            const questionDiv = document.querySelector(`.question:nth-child(${qIndex + 2})`);
+                            const feedbackDiv = document.createElement('div');
+                            feedbackDiv.classList.add('feedback');
+
+                            if (selectedAnswer && selectedAnswer.value === question.answers.find(answer => answer.isCorrect).text) {
+                                feedbackDiv.classList.add('correct');
+                                feedbackDiv.innerText = 'Correct!';
+                            } else {
+                                feedbackDiv.classList.add('incorrect');
+                                feedbackDiv.innerText = 'Incorrect!';
+                            }
+
+                            questionDiv.appendChild(feedbackDiv);
+                        });
                         alert('Quiz submitted successfully!');
                     } else {
                         const error = await response.json();
