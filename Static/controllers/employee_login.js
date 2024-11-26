@@ -60,7 +60,11 @@ router.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, hashedPassword);
         
         if (isPasswordValid) {
-            res.status(200).json({ redirectUrl: '/static/views/employee.html' }); // Updated redirect URL
+            // Store employee ID in session storage via frontend
+            res.status(200).json({
+                employeeId: EmployeeID, // Return employee ID to be stored on frontend
+                redirectUrl: '/static/views/employee.html' // Updated redirect URL
+            });
         } else {
             console.error('Login failed: Invalid password for email:', email);
             res.status(401).json({ error: 'Invalid employee credentials.' });

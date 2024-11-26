@@ -76,10 +76,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                 });
 
+                // Retrieve employeeId from local storage or session storage
+                const employeeId = sessionStorage.getItem('employeeId');
+                if (!employeeId) {
+                    alert('No employee ID found. Please log in again.');
+                    return;
+                }
+
                 // Create result object
                 const result = {
                     title: quiz.title,
-                    employeeId: `EMP${Math.floor(Math.random() * 1000)}`, // Dummy employee ID, replace with actual ID if available
+                    employeeId: employeeId, // Use actual employee ID from session
                     questions: employeeAnswers
                 };
 
