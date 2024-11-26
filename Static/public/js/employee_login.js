@@ -20,12 +20,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok) {
                     const result = await response.json();
+
+                    // Log and save employeeId in sessionStorage
+                    if (result.employeeId) {
+                        console.log('Employee ID received:', result.employeeId);
+                        sessionStorage.setItem('employeeId', result.employeeId);
+                        console.log('Employee ID saved in sessionStorage');
+                    } else {
+                        console.error('No employeeId found in the response');
+                    }
+
+                    // Redirect til employee dashboard
                     if (result.redirectUrl) {
-                        window.location.href = result.redirectUrl; // Redirect til employee dashboard
+                        window.location.href = result.redirectUrl;
                     }
                 } else {
                     const errorData = await response.json();
-                    alert(errorData.message || 'Invalid credentials.');
+                    alert(errorData.error || 'Invalid credentials.');
                 }
             } catch (error) {
                 console.error('Error during login:', error);
