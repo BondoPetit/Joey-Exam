@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         // Show feedback after submission
                         quiz.questions.forEach((question, qIndex) => {
                             const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
-                            const questionDiv = document.querySelector(`.question:nth-child(${qIndex + 2})`);
+                            const questionDiv = document.querySelectorAll('.question')[qIndex];
                             const feedbackDiv = document.createElement('div');
                             feedbackDiv.classList.add('feedback');
 
@@ -128,8 +128,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.error('Error during quiz submission:', err);
                     alert('An error occurred while submitting the quiz.');
                 }
-
-                quizList.innerHTML = ''; // Clear quiz list or redirect user as needed
             };
             quizContainer.appendChild(submitButton);
 
