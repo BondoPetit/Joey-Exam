@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express'); 
 const path = require('path');
 const cors = require('cors'); // Importer cors middleware
 const bcrypt = require('bcrypt');
@@ -17,10 +17,10 @@ const { getPool } = require('./database');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Brug CORS middleware for at tillade anmodninger fra bestemte domæner
+// Brug CORS middleware for at tillade anmodninger kun fra produktionsdomænet
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'https://joe-and-the-juice.engineer', 'http://localhost:3000'], // Tillad lokalt udviklingsdomæne og produktionsdomæne, inkl. http://localhost:3000
-    methods: ['GET', 'POST'], // Tillad kun GET og POST anmodninger
+    origin: ['https://joe-and-the-juice.engineer'], // Tillad kun produktionsdomænet
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Tillad GET, POST, PUT, DELETE, og OPTIONS anmodninger
     allowedHeaders: ['Content-Type', 'Authorization'], // Tillad specifikke headers
     credentials: true // Tillad autoriseringsoplysninger og cookies
 }));
