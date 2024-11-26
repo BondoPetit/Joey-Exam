@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 quizDiv.classList.add('quiz');
                 quizDiv.innerHTML = `
                     <h3>${quiz.title}</h3>
-                    <button onclick="startQuiz(${index})">Take Quiz</button>
+                    <button onclick="startQuiz(${quiz.quizID})">Take Quiz</button>
                 `;
                 quizList.appendChild(quizDiv);
             });
@@ -30,9 +30,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Function to handle quiz taking
-    window.startQuiz = async function (quizIndex) {
+    window.startQuiz = async function (quizID) {
         try {
-            const response = await fetch(`https://joe-and-the-juice.engineer/employee/get/${quizIndex}`);
+            const response = await fetch(`https://joe-and-the-juice.engineer/employee/get/${quizID}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch quiz details from the server');
             }
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     answerInput.name = `question-${qIndex}`;
                     answerInput.value = aIndex + 1;
                     answerLabel.appendChild(answerInput);
-                    answerLabel.append(` ${answer}`);
+                    answerLabel.append(` ${answer.text}`);
                     questionDiv.appendChild(answerLabel);
                     questionDiv.appendChild(document.createElement('br'));
                 });
