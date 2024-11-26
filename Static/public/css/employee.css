@@ -139,11 +139,23 @@ button:hover {
 }
 
 /* Positioner "Submit Quiz"- og "Back to Available Quizzes"-knapper side om side */
+.button-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+}
+
 button.submit-quiz {
-    margin-right: 10px;
+    order: 1;
 }
 
 button.back-button {
-    display: inline-block;
-    vertical-align: middle;
+    order: 2;
+    background-color: #bbbbbb;
+    color: black;
+}
+
+button.back-button:hover {
+    background-color: #888888;
 } 
