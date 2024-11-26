@@ -42,6 +42,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             quizContainer.classList.add('quiz-container');
             quizContainer.innerHTML = `<h3>${quiz.title}</h3>`;
 
+            const backButton = document.createElement('button');
+            backButton.textContent = 'Back to Available Quizzes';
+            backButton.onclick = () => {
+                quizContainer.remove();
+                loadAvailableQuizzes();
+            };
+            quizContainer.appendChild(backButton);
+
             quiz.questions.forEach((question, qIndex) => {
                 const questionDiv = document.createElement('div');
                 questionDiv.classList.add('question');
@@ -137,5 +145,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error fetching quiz details:', error);
             quizList.innerHTML = '<p>Error fetching quiz details. Please try again later.</p>';
         }
+    }
+
+    // Function to reload available quizzes
+    function loadAvailableQuizzes() {
+        quizList.innerHTML = '';
+        quizzes.forEach((quiz) => {
+            const quizDiv = document.createElement('div');
+            quizDiv.classList.add('quiz');
+            quizDiv.innerHTML = `
+                <h3>${quiz.title}</h3>
+                <button onclick="startQuiz(${quiz.quizID})">Take Quiz</button>
+            `;
+            quizList.appendChild(quizDiv);
+        });
     }
 });
