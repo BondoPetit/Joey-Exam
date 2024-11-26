@@ -106,7 +106,7 @@ button:hover {
     background-color: #8f2e55;
 }
 
-/*rigtigt og forkert svar*/
+/* rigtigt og forkert svar */
 .feedback {
     font-size: 1.2em;
     font-weight: bold;
@@ -137,3 +137,13 @@ button:hover {
         opacity: 0;
     }
 }
+
+/* Positioner "Submit Quiz"- og "Back to Available Quizzes"-knapper side om side */
+button.submit-quiz {
+    margin-right: 10px;
+}
+
+button.back-button {
+    display: inline-block;
+    vertical-align: middle;
+} 
