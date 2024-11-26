@@ -57,6 +57,63 @@ router.get('/get', async (req, res) => {
     }
 });
 
+// Route for fetching a specific quiz by ID
+router.get('/get/:id', async (req, res) => {
+    const quizID = req.params.id;
+    console.log(`GET /employee/get/${quizID} endpoint hit`);
+    console.log('Fetching quiz details...');
+    try {
+        const pool = await getPool();
+        const quizResult = await pool.request()
+            .input('quizID', sql.Int, quizID)
+            .query(`
+                SELECT q.QuizID, q.Title, 
+                       qs.QuestionID, qs.Text AS QuestionText, 
+                       a.AnswerID, a.Text AS AnswerText, a.IsCorrect
+                FROM Quizzes q
+                LEFT JOIN Questions qs ON q.QuizID = qs.QuizID
+                LEFT JOIN Answers a ON qs.QuestionID = a.QuestionID
+                WHERE q.QuizID = @quizID
+            `);
+
+        const records = quizResult.recordset;
+        if (records.length === 0) {
+            console.log('No quiz found with the given ID.');
+            return res.status(404).json({ error: 'Quiz not found.' });
+        }
+
+        const quiz = {
+            quizID: records[0].QuizID,
+            title: records[0].Title,
+            questions: []
+        };
+
+        records.forEach(record => {
+            let question = quiz.questions.find(q => q.questionID === record.QuestionID);
+            if (!question && record.QuestionID) {
+                question = {
+                    questionID: record.QuestionID,
+                    text: record.QuestionText,
+                    answers: []
+                };
+                quiz.questions.push(question);
+            }
+            if (question && record.AnswerID) {
+                question.answers.push({
+                    answerID: record.AnswerID,
+                    text: record.AnswerText,
+                    isCorrect: record.IsCorrect
+                });
+            }
+        });
+
+        res.status(200).json(quiz);
+    } catch (err) {
+        console.error('Error fetching quiz details:', err.message);
+        res.status(500).json({ error: 'An error occurred while fetching quiz details.' });
+    }
+});
+
 // Route for saving employee quiz answers
 router.post('/submit', async (req, res) => {
     console.log('POST /employee/submit endpoint hit');

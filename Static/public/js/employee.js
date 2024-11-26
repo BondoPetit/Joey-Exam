@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (quizzes.length === 0) {
             quizList.innerHTML = '<p>No quizzes available at the moment. Please check back later.</p>';
         } else {
-            quizzes.forEach((quiz, index) => {
+            quizzes.forEach((quiz) => {
                 const quizDiv = document.createElement('div');
                 quizDiv.classList.add('quiz');
                 quizDiv.innerHTML = `
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const answerInput = document.createElement('input');
                     answerInput.type = 'radio';
                     answerInput.name = `question-${qIndex}`;
-                    answerInput.value = aIndex + 1;
+                    answerInput.value = answer.text;
                     answerLabel.appendChild(answerInput);
                     answerLabel.append(` ${answer.text}`);
                     questionDiv.appendChild(answerLabel);
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     employeeAnswers.push({
                         text: question.text,
                         employeeAnswer: selectedAnswer ? selectedAnswer.value : "No answer",
-                        correctAnswer: question.correctAnswer
+                        correctAnswer: question.answers.find(answer => answer.isCorrect).text
                     });
                 });
 

@@ -4,173 +4,75 @@ const sql = require('mssql');
 const router = express.Router();
 const { getPool } = require('../../database');
 
-// Route for fetching all quizzes for employees
-router.get('/get', async (req, res) => {
-    console.log('GET /employee/get endpoint hit');
-    console.log('Fetching quizzes...');
-    try {
-        const pool = await getPool();
-        const quizzesResult = await pool.request().query(`
-            SELECT q.QuizID, q.Title, 
-                   qs.QuestionID, qs.Text AS QuestionText, 
-                   a.AnswerID, a.Text AS AnswerText, a.IsCorrect
-            FROM Quizzes q
-            LEFT JOIN Questions qs ON q.QuizID = qs.QuizID
-            LEFT JOIN Answers a ON qs.QuestionID = a.QuestionID
-        `);
+// Route for saving a new quiz
+router.post('/save', async (req, res) => {
+    const { title, questions } = req.body;
 
-        const records = quizzesResult.recordset;
-        const quizzesMap = {};
-
-        records.forEach(record => {
-            if (!quizzesMap[record.QuizID]) {
-                quizzesMap[record.QuizID] = {
-                    quizID: record.QuizID,
-                    title: record.Title,
-                    questions: []
-                };
-            }
-            let quiz = quizzesMap[record.QuizID];
-            let question = quiz.questions.find(q => q.questionID === record.QuestionID);
-            if (!question && record.QuestionID) {
-                question = {
-                    questionID: record.QuestionID,
-                    text: record.QuestionText,
-                    answers: []
-                };
-                quiz.questions.push(question);
-            }
-            if (question && record.AnswerID) {
-                question.answers.push({
-                    answerID: record.AnswerID,
-                    text: record.AnswerText,
-                    isCorrect: record.IsCorrect
-                });
-            }
-        });
-
-        const quizzesWithQuestions = Object.values(quizzesMap);
-        res.status(200).json(quizzesWithQuestions);
-    } catch (err) {
-        console.error('Error fetching quizzes:', err.message);
-        res.status(500).json({ error: 'An error occurred while fetching quizzes.' });
-    }
-});
-
-// Route for fetching a specific quiz by ID
-router.get('/get/:id', async (req, res) => {
-    const quizID = req.params.id;
-    console.log(`GET /employee/get/${quizID} endpoint hit`);
-    console.log('Fetching quiz details...');
-    try {
-        const pool = await getPool();
-        const quizResult = await pool.request()
-            .input('quizID', sql.Int, quizID)
-            .query(`
-                SELECT q.QuizID, q.Title, 
-                       qs.QuestionID, qs.Text AS QuestionText, 
-                       a.AnswerID, a.Text AS AnswerText, a.IsCorrect
-                FROM Quizzes q
-                LEFT JOIN Questions qs ON q.QuizID = qs.QuizID
-                LEFT JOIN Answers a ON qs.QuestionID = a.QuestionID
-                WHERE q.QuizID = @quizID
-            `);
-
-        const records = quizResult.recordset;
-        if (records.length === 0) {
-            console.log('No quiz found with the given ID.');
-            return res.status(404).json({ error: 'Quiz not found.' });
-        }
-
-        const quiz = {
-            quizID: records[0].QuizID,
-            title: records[0].Title,
-            questions: []
-        };
-
-        records.forEach(record => {
-            let question = quiz.questions.find(q => q.questionID === record.QuestionID);
-            if (!question && record.QuestionID) {
-                question = {
-                    questionID: record.QuestionID,
-                    text: record.QuestionText,
-                    answers: []
-                };
-                quiz.questions.push(question);
-            }
-            if (question && record.AnswerID) {
-                question.answers.push({
-                    answerID: record.AnswerID,
-                    text: record.AnswerText,
-                    isCorrect: record.IsCorrect
-                });
-            }
-        });
-
-        res.status(200).json(quiz);
-    } catch (err) {
-        console.error('Error fetching quiz details:', err.message);
-        res.status(500).json({ error: 'An error occurred while fetching quiz details.' });
-    }
-});
-
-// Route for saving employee quiz answers
-router.post('/submit', async (req, res) => {
-    console.log('POST /employee/submit endpoint hit');
-    console.log('Saving quiz answers...');
-    const { title, employeeId, questions } = req.body;
-
-    if (!title || !employeeId || !questions || !Array.isArray(questions)) {
-        return res.status(400).json({ error: 'Invalid submission data. Title, employee ID, and questions are required.' });
+    if (!title || !questions || !Array.isArray(questions)) {
+        return res.status(400).json({ error: 'Invalid quiz data. Title and questions are required.' });
     }
 
-    let transaction;
     try {
         const pool = await getPool();
-        transaction = new sql.Transaction(pool);
+        const transaction = new sql.Transaction(pool); // Initialize transaction
         await transaction.begin();
 
-        // Insert quiz result into EmployeeResults table
-        const resultRequest = new sql.Request(transaction);
-        const result = await resultRequest
+        // Insert quiz into the Quizzes table
+        const quizRequest = new sql.Request(transaction);
+        const quizResult = await quizRequest
             .input('title', sql.NVarChar, title)
-            .input('employeeId', sql.NVarChar, employeeId)
             .query(`
-                INSERT INTO EmployeeResults (Title, EmployeeID)
-                OUTPUT inserted.ResultID
-                VALUES (@title, @employeeId)
+                INSERT INTO Quizzes (Title)
+                OUTPUT inserted.QuizID
+                VALUES (@title)
             `);
 
-        const resultID = result.recordset[0].ResultID;
+        const quizID = quizResult.recordset[0].QuizID;
 
-        // Insert each question response into EmployeeAnswers table
-        const answerPromises = questions.map(question => {
-            const answerRequest = new sql.Request(transaction);
-            return answerRequest
-                .input('resultID', sql.Int, resultID)
-                .input('questionText', sql.NVarChar, question.text)
-                .input('employeeAnswer', sql.NVarChar, question.employeeAnswer)
-                .input('correctAnswer', sql.NVarChar, question.correctAnswer)
+        // Insert questions into the Questions table
+        for (let i = 0; i < questions.length; i++) {
+            const question = questions[i];
+
+            const questionRequest = new sql.Request(transaction);
+            const questionResult = await questionRequest
+                .input('quizID', sql.Int, quizID)
+                .input('text', sql.NVarChar, question.text)
                 .query(`
-                    INSERT INTO EmployeeAnswers (ResultID, QuestionText, EmployeeAnswer, CorrectAnswer)
-                    VALUES (@resultID, @questionText, @employeeAnswer, @correctAnswer)
+                    INSERT INTO Questions (QuizID, Text)
+                    OUTPUT inserted.QuestionID
+                    VALUES (@quizID, @text)
                 `);
-        });
 
-        await Promise.all(answerPromises);
-        await transaction.commit();
-        res.status(201).json({ message: 'Quiz answers saved successfully.' });
-    } catch (err) {
-        console.error('Error saving quiz answers:', err.message);
-        if (transaction) {
-            try {
-                await transaction.rollback();
-                console.error('Transaction rolled back due to an error.');
-            } catch (rollbackError) {
-                console.error('Error rolling back transaction:', rollbackError.message);
+            const questionID = questionResult.recordset[0].QuestionID;
+
+            // Insert answers into the Answers table
+            for (let j = 0; j < question.answers.length; j++) {
+                const answerText = question.answers[j];
+                const isCorrect = parseInt(question.correctAnswer, 10) === (j + 1);
+
+                const answerRequest = new sql.Request(transaction);
+                await answerRequest
+                    .input('questionID', sql.Int, questionID)
+                    .input('text', sql.NVarChar, answerText)
+                    .input('isCorrect', sql.Bit, isCorrect)
+                    .query(`
+                        INSERT INTO Answers (QuestionID, Text, IsCorrect)
+                        VALUES (@questionID, @text, @isCorrect)
+                    `);
             }
         }
-        res.status(500).json({ error: 'An error occurred while saving quiz answers.' });
+
+        await transaction.commit();
+        res.status(201).json({ message: 'Quiz saved successfully.' });
+    } catch (err) {
+        console.error('Error saving quiz:', err.message);
+        try {
+            await transaction.rollback();
+            console.error('Transaction rolled back due to an error.');
+        } catch (rollbackError) {
+            console.error('Error rolling back transaction:', rollbackError.message);
+        }
+        res.status(500).json({ error: 'An error occurred while saving the quiz.' });
     }
 });
 
