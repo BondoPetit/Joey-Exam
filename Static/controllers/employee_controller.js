@@ -121,6 +121,7 @@ router.post('/submit', async (req, res) => {
     const { title, employeeId, questions } = req.body;
 
     if (!title || !employeeId || !questions || !Array.isArray(questions)) {
+        console.error('Invalid submission data:', req.body);
         return res.status(400).json({ error: 'Invalid submission data. Title, employee ID, and questions are required.' });
     }
 
@@ -141,23 +142,31 @@ router.post('/submit', async (req, res) => {
                 VALUES (@title, @employeeId)
             `);
 
+        if (!result.recordset || result.recordset.length === 0) {
+            throw new Error('Failed to insert into EmployeeResults. No result ID returned.');
+        }
+
         const resultID = result.recordset[0].ResultID;
 
         // Insert each question response into EmployeeAnswers table
-        const answerPromises = questions.map(question => {
+        for (let question of questions) {
+            if (!question.text || !question.employeeAnswer) {
+                console.error('Invalid question data:', question);
+                throw new Error('Invalid question data. Each question must have text and an employee answer.');
+            }
+
             const answerRequest = new sql.Request(transaction);
-            return answerRequest
+            await answerRequest
                 .input('resultID', sql.Int, resultID)
                 .input('questionText', sql.NVarChar, question.text)
                 .input('employeeAnswer', sql.NVarChar, question.employeeAnswer)
-                .input('correctAnswer', sql.NVarChar, question.correctAnswer)
+                .input('correctAnswer', sql.NVarChar, question.correctAnswer || null)
                 .query(`
                     INSERT INTO EmployeeAnswers (ResultID, QuestionText, EmployeeAnswer, CorrectAnswer)
                     VALUES (@resultID, @questionText, @employeeAnswer, @correctAnswer)
                 `);
-        });
+        }
 
-        await Promise.all(answerPromises);
         await transaction.commit();
         res.status(201).json({ message: 'Quiz answers saved successfully.' });
     } catch (err) {
