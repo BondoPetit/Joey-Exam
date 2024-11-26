@@ -10,11 +10,10 @@ router.get('/results', async (req, res) => {
     try {
         const pool = await getPool();
         const resultsQuery = await pool.request().query(`
-            SELECT r.ResultID, r.Title, r.EmployeeID, q.Text AS QuestionText, ea.EmployeeAnswer, ea.CorrectAnswer
+            SELECT r.ResultID, r.Title, r.EmployeeID, ea.QuestionText, ea.EmployeeAnswer, ea.CorrectAnswer
             FROM EmployeeResults r
             LEFT JOIN EmployeeAnswers ea ON r.ResultID = ea.ResultID
-            LEFT JOIN Questions q ON ea.QuestionID = q.QuestionID
-            ORDER BY r.ResultID, q.QuestionID
+            ORDER BY r.ResultID
         `);
 
         const rawResults = resultsQuery.recordset;
