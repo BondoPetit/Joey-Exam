@@ -11,6 +11,7 @@ const admin_login = require('./Static/controllers/admin_login'); // Importer adm
 const employee_login = require('./Static/controllers/employee_login');
 const quiz_controller = require('./Static/controllers/quiz_controller'); // Importer quiz controller
 const employee_controller = require('./Static/controllers/employee_controller'); // Importer employee controller
+const result_controller = require('./Static/controllers/result_controller'); // Importer result controller
 const { getPool } = require('./database');
 
 // Middleware setup
@@ -48,6 +49,7 @@ app.use('/admin_login', admin_login);
 app.use('/employee_login', employee_login);
 app.use('/quiz', quiz_controller); // Brug quiz controlleren
 app.use('/employee', employee_controller); // Simplificér employee controlleren uden ekstra middleware
+app.use('/quiz', result_controller); // Brug result controlleren til quizresultater
 
 // Tilføj logning for at spore anmodninger til admin_login ruten
 app.post('/admin_login/login', (req, res, next) => {
