@@ -141,17 +141,17 @@ button:hover {
 /* Positioner "Submit Quiz"- og "Back to Available Quizzes"-knapper side om side */
 .button-container {
     display: flex;
-    justify-content: flex-start;
-    gap: 10px;
+    justify-content: space-between; /* Placerer knapperne med lige plads mellem dem */
+    gap: 20px;
     margin-top: 20px;
 }
 
 button.submit-quiz {
-    order: 1;
+    flex: 1;
 }
 
 button.back-button {
-    order: 2;
+    flex: 1;
     background-color: #bbbbbb;
     color: black;
 }

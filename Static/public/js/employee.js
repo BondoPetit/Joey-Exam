@@ -42,36 +42,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             quizContainer.classList.add('quiz-container');
             quizContainer.innerHTML = `<h3>${quiz.title}</h3>`;
 
+            const buttonContainer = document.createElement('div');
+            buttonContainer.classList.add('button-container');
+
             const backButton = document.createElement('button');
             backButton.textContent = 'Back to Available Quizzes';
+            backButton.classList.add('back-button');
             backButton.onclick = () => {
                 quizContainer.remove();
                 loadAvailableQuizzes();
             };
-            quizContainer.appendChild(backButton);
-
-            quiz.questions.forEach((question, qIndex) => {
-                const questionDiv = document.createElement('div');
-                questionDiv.classList.add('question');
-                questionDiv.innerHTML = `
-                    <p><strong>Question ${qIndex + 1}: </strong>${question.text}</p>
-                `;
-                question.answers.forEach((answer, aIndex) => {
-                    const answerLabel = document.createElement('label');
-                    const answerInput = document.createElement('input');
-                    answerInput.type = 'radio';
-                    answerInput.name = `question-${qIndex}`;
-                    answerInput.value = answer.text;
-                    answerLabel.appendChild(answerInput);
-                    answerLabel.append(` ${answer.text}`);
-                    questionDiv.appendChild(answerLabel);
-                    questionDiv.appendChild(document.createElement('br'));
-                });
-                quizContainer.appendChild(questionDiv);
-            });
+            buttonContainer.appendChild(backButton);
 
             const submitButton = document.createElement('button');
             submitButton.textContent = 'Submit Quiz';
+            submitButton.classList.add('submit-quiz');
             submitButton.onclick = async () => {
                 // Gather results from the quiz
                 const employeeAnswers = [];
@@ -137,7 +122,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                     alert('An error occurred while submitting the quiz.');
                 }
             };
-            quizContainer.appendChild(submitButton);
+            buttonContainer.appendChild(submitButton);
+
+            quizContainer.appendChild(buttonContainer);
+
+            quiz.questions.forEach((question, qIndex) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <p><strong>Question ${qIndex + 1}: </strong>${question.text}</p>
+                `;
+                question.answers.forEach((answer, aIndex) => {
+                    const answerLabel = document.createElement('label');
+                    const answerInput = document.createElement('input');
+                    answerInput.type = 'radio';
+                    answerInput.name = `question-${qIndex}`;
+                    answerInput.value = answer.text;
+                    answerLabel.appendChild(answerInput);
+                    answerLabel.append(` ${answer.text}`);
+                    questionDiv.appendChild(answerLabel);
+                    questionDiv.appendChild(document.createElement('br'));
+                });
+                quizContainer.appendChild(questionDiv);
+            });
 
             quizList.innerHTML = '';
             quizList.appendChild(quizContainer);
