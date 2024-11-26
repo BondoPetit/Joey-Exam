@@ -36,7 +36,7 @@ router.post('/login', async (req, res) => {
             res.status(200).json({ 
                 message: 'Login successful',
                 adminID: AdminID, // Send AdminID back to the client if needed
-                redirectUrl: '/views/admin.html' // Updated redirect URL
+                redirectUrl: '/static/views/admin.html' // Updated redirect URL
             });
         } else {
             console.error('Login failed: Invalid password for username:', username);
