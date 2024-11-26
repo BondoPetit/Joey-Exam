@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 quizDiv.classList.add('quiz-result');
                 quizDiv.innerHTML = `
                     <h3>Quiz: ${quiz.title}</h3>
-                    <button class="toggle-results-button">Show Results</button>
+                    <button class="toggle-results-button">Show Employee Answers</button>
                     <div class="quiz-results hidden"></div>
                 `;
 
@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <p class="correct-answer"><strong>Correct Answer:</strong> ${question.correctAnswer}</p>
                             <p class="${question.isCorrect ? 'correct' : 'incorrect'}">${question.isCorrect ? 'Correct' : 'Incorrect'}</p>
                         `;
+                        questionBlock.classList.add('hidden'); // Initially hide question details
                         resultDiv.appendChild(questionBlock);
                     });
 
@@ -49,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const toggleButton = quizDiv.querySelector('.toggle-results-button');
                 toggleButton.addEventListener('click', () => {
                     resultsContainer.classList.toggle('hidden');
-                    toggleButton.textContent = resultsContainer.classList.contains('hidden') ? 'Show Results' : 'Hide Results';
+                    toggleButton.textContent = resultsContainer.classList.contains('hidden') ? 'Show Employee Answers' : 'Hide Employee Answers';
                 });
 
                 resultsList.appendChild(quizDiv);
