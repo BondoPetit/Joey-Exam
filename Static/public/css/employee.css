@@ -105,3 +105,35 @@ button {
 button:hover {
     background-color: #8f2e55;
 }
+
+/*rigtigt og forkert svar*/
+.feedback {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+    animation: fadeInOut 2s ease-in-out;
+}
+
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

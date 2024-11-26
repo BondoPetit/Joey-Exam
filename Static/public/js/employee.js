@@ -58,6 +58,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                     answerLabel.append(` ${answer.text}`);
                     questionDiv.appendChild(answerLabel);
                     questionDiv.appendChild(document.createElement('br'));
+
+                    // Add event listener to handle feedback on answer selection
+                    answerInput.addEventListener('change', () => {
+                        const isCorrect = answer.isCorrect;
+                        const feedbackDiv = document.createElement('div');
+                        feedbackDiv.classList.add('feedback');
+
+                        if (isCorrect) {
+                            feedbackDiv.classList.add('correct');
+                            feedbackDiv.innerText = 'Correct!';
+                        } else {
+                            feedbackDiv.classList.add('incorrect');
+                            feedbackDiv.innerText = 'Incorrect!';
+                        }
+
+                        questionDiv.appendChild(feedbackDiv);
+
+                        // Remove the feedback after 2 seconds
+                        setTimeout(() => {
+                            questionDiv.removeChild(feedbackDiv);
+                        }, 2000);
+                    });
                 });
                 quizContainer.appendChild(questionDiv);
             });
