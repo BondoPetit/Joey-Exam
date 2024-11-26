@@ -1,32 +1,44 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const resultsList = document.getElementById('results-list');
 
-    // Fetch quiz results from local storage
-    const quizResults = JSON.parse(localStorage.getItem('quizResults')) || [];
+    try {
+        // Fetch quiz results from the server
+        const response = await fetch('https://joe-and-the-juice.engineer/quiz/results');
+        if (!response.ok) {
+            throw new Error('Failed to fetch quiz results from the server');
+        }
 
-    if (quizResults.length === 0) {
-        resultsList.innerHTML = '<p>No quiz results available at the moment.</p>';
-    } else {
-        quizResults.forEach((result, index) => {
-            const resultDiv = document.createElement('div');
-            resultDiv.classList.add('result');
-            resultDiv.innerHTML = `
-                <h3>Quiz: ${result.title}</h3>
-                <p><strong>Submitted by Employee ID:</strong> ${result.employeeId}</p>
-            `;
+        const quizResults = await response.json();
 
-            result.questions.forEach((question, qIndex) => {
-                const questionBlock = document.createElement('div');
-                questionBlock.classList.add('question-block');
-                questionBlock.innerHTML = `
-                    <p><strong>Question ${qIndex + 1}: ${question.text}</strong></p>
-                    <p class="answer"><strong>Employee's Answer:</strong> ${question.employeeAnswer}</p>
-                    <p class="correct-answer"><strong>Correct Answer:</strong> ${question.correctAnswer}</p>
+        if (quizResults.length === 0) {
+            resultsList.innerHTML = '<p>No quiz results available at the moment.</p>';
+        } else {
+            quizResults.forEach((result, index) => {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result');
+                resultDiv.innerHTML = `
+                    <h3>Quiz: ${result.title}</h3>
+                    <p><strong>Submitted by Employee ID:</strong> ${result.employeeId}</p>
+                    <p><strong>Incorrect Answers Count:</strong> ${result.incorrectCount}</p>
                 `;
-                resultDiv.appendChild(questionBlock);
-            });
 
-            resultsList.appendChild(resultDiv);
-        });
+                result.questions.forEach((question, qIndex) => {
+                    const questionBlock = document.createElement('div');
+                    questionBlock.classList.add('question-block');
+                    questionBlock.innerHTML = `
+                        <p><strong>Question ${qIndex + 1}: ${question.text}</strong></p>
+                        <p class="answer"><strong>Employee's Answer:</strong> ${question.employeeAnswer}</p>
+                        <p class="correct-answer"><strong>Correct Answer:</strong> ${question.correctAnswer}</p>
+                        <p class="${question.isCorrect ? 'correct' : 'incorrect'}">${question.isCorrect ? 'Correct' : 'Incorrect'}</p>
+                    `;
+                    resultDiv.appendChild(questionBlock);
+                });
+
+                resultsList.appendChild(resultDiv);
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching quiz results:', error);
+        resultsList.innerHTML = '<p>Error fetching quiz results. Please try again later.</p>';
     }
 });
