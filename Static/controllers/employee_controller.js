@@ -11,7 +11,7 @@ router.get('/get', async (req, res) => {
     try {
         const pool = await getPool();
         const quizzesResult = await pool.request().query(`
-            SELECT q.QuizID, q.Title, q.Description, 
+            SELECT q.QuizID, q.Title, 
                    qs.QuestionID, qs.Text AS QuestionText, 
                    a.AnswerID, a.Text AS AnswerText, a.IsCorrect
             FROM Quizzes q
@@ -27,7 +27,6 @@ router.get('/get', async (req, res) => {
                 quizzesMap[record.QuizID] = {
                     quizID: record.QuizID,
                     title: record.Title,
-                    description: record.Description,
                     questions: []
                 };
             }
