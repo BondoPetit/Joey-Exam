@@ -1,6 +1,7 @@
 // This script is responsible for fetching quizzes from the database and displaying them for employees to take.
 document.addEventListener('DOMContentLoaded', async () => {
     const quizList = document.getElementById('quiz-list');
+    let quizzes = []; // Declare quizzes variable to be used globally
 
     try {
         // Fetch quizzes from the server
@@ -9,20 +10,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Failed to fetch quizzes from the server');
         }
 
-        const quizzes = await response.json();
+        quizzes = await response.json();
 
         if (quizzes.length === 0) {
             quizList.innerHTML = '<p>No quizzes available at the moment. Please check back later.</p>';
         } else {
-            quizzes.forEach((quiz) => {
-                const quizDiv = document.createElement('div');
-                quizDiv.classList.add('quiz');
-                quizDiv.innerHTML = `
-                    <h3>${quiz.title}</h3>
-                    <button onclick="startQuiz(${quiz.quizID})">Take Quiz</button>
-                `;
-                quizList.appendChild(quizDiv);
-            });
+            loadAvailableQuizzes();
         }
     } catch (error) {
         console.error('Error fetching quizzes:', error);
