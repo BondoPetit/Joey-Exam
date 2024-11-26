@@ -42,6 +42,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             quizContainer.classList.add('quiz-container');
             quizContainer.innerHTML = `<h3>${quiz.title}</h3>`;
 
+            quiz.questions.forEach((question, qIndex) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <p><strong>Question ${qIndex + 1}: </strong>${question.text}</p>
+                `;
+                question.answers.forEach((answer, aIndex) => {
+                    const answerLabel = document.createElement('label');
+                    const answerInput = document.createElement('input');
+                    answerInput.type = 'radio';
+                    answerInput.name = `question-${qIndex}`;
+                    answerInput.value = answer.text;
+                    answerLabel.appendChild(answerInput);
+                    answerLabel.append(` ${answer.text}`);
+                    questionDiv.appendChild(answerLabel);
+                    questionDiv.appendChild(document.createElement('br'));
+                });
+                quizContainer.appendChild(questionDiv);
+            });
+
+            // Create button container and buttons
             const buttonContainer = document.createElement('div');
             buttonContainer.classList.add('button-container');
 
@@ -124,27 +145,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             buttonContainer.appendChild(submitButton);
 
+            // Append button container after questions
             quizContainer.appendChild(buttonContainer);
-
-            quiz.questions.forEach((question, qIndex) => {
-                const questionDiv = document.createElement('div');
-                questionDiv.classList.add('question');
-                questionDiv.innerHTML = `
-                    <p><strong>Question ${qIndex + 1}: </strong>${question.text}</p>
-                `;
-                question.answers.forEach((answer, aIndex) => {
-                    const answerLabel = document.createElement('label');
-                    const answerInput = document.createElement('input');
-                    answerInput.type = 'radio';
-                    answerInput.name = `question-${qIndex}`;
-                    answerInput.value = answer.text;
-                    answerLabel.appendChild(answerInput);
-                    answerLabel.append(` ${answer.text}`);
-                    questionDiv.appendChild(answerLabel);
-                    questionDiv.appendChild(document.createElement('br'));
-                });
-                quizContainer.appendChild(questionDiv);
-            });
 
             quizList.innerHTML = '';
             quizList.appendChild(quizContainer);
