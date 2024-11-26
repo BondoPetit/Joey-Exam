@@ -114,10 +114,10 @@ router.get('/get/:id', async (req, res) => {
     }
 });
 
-// Route for saving employee quiz answers
+// Route for saving or updating employee quiz answers
 router.post('/submit', async (req, res) => {
     console.log('POST /employee/submit endpoint hit');
-    console.log('Saving quiz answers...');
+    console.log('Saving or updating quiz answers...');
     const { title, employeeId, questions } = req.body;
 
     if (!title || !employeeId || !questions || !Array.isArray(questions)) {
@@ -131,24 +131,47 @@ router.post('/submit', async (req, res) => {
         transaction = new sql.Transaction(pool);
         await transaction.begin();
 
-        // Insert quiz result into EmployeeResults table
-        const resultRequest = new sql.Request(transaction);
-        const result = await resultRequest
+        // Tjek, om der allerede findes et resultat for denne quiz og medarbejder
+        const existingResult = await pool.request()
             .input('title', sql.NVarChar, title)
             .input('employeeId', sql.NVarChar, employeeId)
             .query(`
-                INSERT INTO EmployeeResults (Title, EmployeeID)
-                OUTPUT inserted.ResultID
-                VALUES (@title, @employeeId)
+                SELECT ResultID
+                FROM EmployeeResults
+                WHERE Title = @title AND EmployeeID = @employeeId
             `);
 
-        if (!result.recordset || result.recordset.length === 0) {
-            throw new Error('Failed to insert into EmployeeResults. No result ID returned.');
+        let resultID;
+        if (existingResult.recordset.length > 0) {
+            // Hvis et resultat allerede findes, slet gamle svar
+            resultID = existingResult.recordset[0].ResultID;
+            await pool.request()
+                .input('resultID', sql.Int, resultID)
+                .query(`
+                    DELETE FROM EmployeeAnswers
+                    WHERE ResultID = @resultID
+                `);
+            console.log(`Existing result found for EmployeeID ${employeeId}, deleting old answers...`);
+        } else {
+            // Hvis der ikke findes et resultat, indsæt et nyt
+            const resultRequest = new sql.Request(transaction);
+            const result = await resultRequest
+                .input('title', sql.NVarChar, title)
+                .input('employeeId', sql.NVarChar, employeeId)
+                .query(`
+                    INSERT INTO EmployeeResults (Title, EmployeeID)
+                    OUTPUT inserted.ResultID
+                    VALUES (@title, @employeeId)
+                `);
+
+            if (!result.recordset || result.recordset.length === 0) {
+                throw new Error('Failed to insert into EmployeeResults. No result ID returned.');
+            }
+            resultID = result.recordset[0].ResultID;
+            console.log(`New result created with ResultID ${resultID} for EmployeeID ${employeeId}`);
         }
 
-        const resultID = result.recordset[0].ResultID;
-
-        // Insert each question response into EmployeeAnswers table
+        // Indsæt de nye svar i EmployeeAnswers
         for (let question of questions) {
             if (!question.text || !question.employeeAnswer) {
                 console.error('Invalid question data:', question);
@@ -170,7 +193,7 @@ router.post('/submit', async (req, res) => {
         await transaction.commit();
         res.status(201).json({ message: 'Quiz answers saved successfully.' });
     } catch (err) {
-        console.error('Error saving quiz answers:', err.message);
+        console.error('Error saving or updating quiz answers:', err.message);
         if (transaction) {
             try {
                 await transaction.rollback();
@@ -179,7 +202,7 @@ router.post('/submit', async (req, res) => {
                 console.error('Error rolling back transaction:', rollbackError.message);
             }
         }
-        res.status(500).json({ error: 'An error occurred while saving quiz answers.' });
+        res.status(500).json({ error: 'An error occurred while saving or updating quiz answers.' });
     }
 });
 
