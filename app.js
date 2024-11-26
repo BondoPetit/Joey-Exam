@@ -35,37 +35,10 @@ app.get('/', (req, res) => {
   res.sendFile(filePath);
 });
 
-// Route to serve employee_login.html directly
-app.get('/Static/views/employee_login.html', (req, res) => {
-  const filePath = path.resolve(__dirname, 'Static/views/employee_login.html');
-  console.log('Serving file from:', filePath);
-  res.sendFile(filePath);
-});
-
-// Route to serve employee_register.html directly
-app.get('/Static/views/employee_register.html', (req, res) => {
-  const filePath = path.resolve(__dirname, 'Static/views/employee_register.html');
-  console.log('Serving file from:', filePath);
-  res.sendFile(filePath);
-});
-
-// Route to serve employee.html directly
-app.get('/Static/views/employee.html', (req, res) => {
-  const filePath = path.resolve(__dirname, 'Static/views/employee.html');
-  console.log('Serving file from:', filePath);
-  res.sendFile(filePath);
-});
-
-// Route to serve admin.html directly
-app.get('/views/admin.html', (req, res) => {
-    const filePath = path.resolve(__dirname, 'Static/views', 'admin.html');
-    console.log('Serving file from:', filePath);
-    res.sendFile(filePath);
-});
-
-// Route to serve result.html directly
-app.get('/Static/views/result.html', (req, res) => {
-  const filePath = path.resolve(__dirname, 'Static/views/result.html');
+// Generic route to serve any HTML file from Static/views directory
+app.get('/Static/views/:filename', (req, res) => {
+  const fileName = req.params.filename;
+  const filePath = path.resolve(__dirname, 'Static/views', fileName);
   console.log('Serving file from:', filePath);
   res.sendFile(filePath);
 });
