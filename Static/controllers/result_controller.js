@@ -13,39 +13,47 @@ router.get('/results', async (req, res) => {
             SELECT r.ResultID, r.Title, r.EmployeeID, ea.QuestionText, ea.EmployeeAnswer, ea.CorrectAnswer
             FROM EmployeeResults r
             LEFT JOIN EmployeeAnswers ea ON r.ResultID = ea.ResultID
-            ORDER BY r.ResultID
+            ORDER BY r.Title, r.ResultID
         `);
 
         const rawResults = resultsQuery.recordset;
         const formattedResults = {};
 
-        // Group results by EmployeeID and Quiz Title
+        // Group results by Quiz Title
         rawResults.forEach(row => {
-            if (!formattedResults[row.EmployeeID]) {
-                formattedResults[row.EmployeeID] = {};
-            }
-            if (!formattedResults[row.EmployeeID][row.Title]) {
-                formattedResults[row.EmployeeID][row.Title] = {
+            if (!formattedResults[row.Title]) {
+                formattedResults[row.Title] = {
                     title: row.Title,
+                    results: [],
+                };
+            }
+
+            let currentQuiz = formattedResults[row.Title];
+            let existingResult = currentQuiz.results.find(result => result.employeeId === row.EmployeeID);
+
+            if (!existingResult) {
+                existingResult = {
                     employeeId: row.EmployeeID,
                     questions: [],
                     incorrectCount: 0,
                 };
+                currentQuiz.results.push(existingResult);
             }
+
             const isCorrect = row.EmployeeAnswer === row.CorrectAnswer;
-            formattedResults[row.EmployeeID][row.Title].questions.push({
+            existingResult.questions.push({
                 text: row.QuestionText,
                 employeeAnswer: row.EmployeeAnswer,
                 correctAnswer: row.CorrectAnswer,
                 isCorrect
             });
             if (!isCorrect) {
-                formattedResults[row.EmployeeID][row.Title].incorrectCount++;
+                existingResult.incorrectCount++;
             }
         });
 
-        // Flatten results into an array
-        const results = Object.values(formattedResults).flatMap(quizGroup => Object.values(quizGroup));
+        // Flatten results into an array for each quiz
+        const results = Object.values(formattedResults);
 
         res.status(200).json(results);
     } catch (err) {
