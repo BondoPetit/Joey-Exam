@@ -253,6 +253,16 @@ router.post('/submit', isAuthenticated, async (req, res) => {
     }
 });
 
+// Route to logout employee
+router.post('/logout', isAuthenticated, (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Could not log out. Please try again.' });
+        }
+        res.status(200).json({ message: 'Logout successful' });
+    });
+});
+
 // Route to check who is logged in (accessible to employee only)
 router.get('/whoami', isAuthenticated, async (req, res) => {
     if (req.session && req.session.isEmployee) {
