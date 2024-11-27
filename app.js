@@ -1,3 +1,5 @@
+require('dotenv').config(); // Dette skal være øverst for at indlæse .env-filen
+
 const express = require('express'); 
 const path = require('path');
 const cors = require('cors'); // Importer cors middleware
@@ -106,3 +108,5 @@ checkDatabaseConnection();
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+

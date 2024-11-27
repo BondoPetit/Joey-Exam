@@ -1,15 +1,67 @@
 // Import the required modules
+require('dotenv').config(); // Dette skal være øverst for at læse .env filen
 const express = require('express');
 const sql = require('mssql');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const { getPool } = require('../../database');
+const twilio = require('twilio');
+
+// Twilio credentials (these should be stored securely, e.g., in environment variables)
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio(accountSid, authToken);
+
+// Route for sending SMS verification code
+router.post('/send-verification-code', async (req, res) => {
+    const { phoneNumber } = req.body;
+    if (!phoneNumber) {
+        return res.status(400).json({ error: 'Phone number is required.' });
+    }
+    try {
+        // Send SMS verification code using Twilio
+        const verificationCode = Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit code
+        await client.messages.create({
+            body: `Your verification code is: ${verificationCode}`,
+            from: process.env.TWILIO_PHONE_NUMBER, // Twilio phone number
+            to: phoneNumber
+        });
+
+        // Store verification code in the session (or database for a more persistent solution)
+        req.session.verificationCode = verificationCode;
+
+        res.status(200).json({ message: 'Verification code sent successfully.' });
+    } catch (err) {
+        console.error('Error sending verification code:', err.message);
+        res.status(500).json({ error: 'An error occurred while sending verification code.' });
+    }
+});
+
+// Route for handling phone number verification
+router.post('/verify-code', async (req, res) => {
+    const { phoneNumber, verificationCode } = req.body;
+    if (!phoneNumber || !verificationCode) {
+        return res.status(400).json({ error: 'Phone number and verification code are required.' });
+    }
+    try {
+        if (req.session.verificationCode && req.session.verificationCode === parseInt(verificationCode, 10)) {
+            // Verification successful, clear the verification code from the session
+            delete req.session.verificationCode;
+            res.status(200).json({ message: 'Phone number verified successfully.' });
+        } else {
+            res.status(400).json({ error: 'Invalid verification code.' });
+        }
+    } catch (err) {
+        console.error('Error verifying phone number:', err.message);
+        res.status(500).json({ error: 'An error occurred while verifying phone number.' });
+    }
+});
 
 // Route for handling employee registration
 router.post('/register', async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required.' });
+    const { email, password, phoneNumber } = req.body;
+    if (!email || !password || !phoneNumber) {
+        return res.status(400).json({ error: 'Email, password, and phone number are required.' });
     }
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -17,10 +69,11 @@ router.post('/register', async (req, res) => {
         const registrationResult = await pool.request()
             .input('email', sql.NVarChar, email)
             .input('password', sql.NVarChar, hashedPassword)
+            .input('phoneNumber', sql.NVarChar, phoneNumber)
             .query(`
-                INSERT INTO Employees (EmployeeEmail, EmployeePassword)
+                INSERT INTO Employees (EmployeeEmail, EmployeePassword, EmployeePhoneNumber)
                 OUTPUT inserted.EmployeeID
-                VALUES (@email, @password)
+                VALUES (@email, @password, @phoneNumber)
             `);
         
         if (registrationResult.recordset.length === 0) {
@@ -28,7 +81,11 @@ router.post('/register', async (req, res) => {
             throw new Error('Failed to register employee.');
         }
 
-        res.status(200).json({ redirectUrl: '/static/views/employee.html' });
+        const employeeId = registrationResult.recordset[0].EmployeeID;
+        
+        req.session.employeeId = employeeId;
+
+        res.status(200).json({ message: 'Registration successful.', redirectUrl: '/static/views/employee.html' });
     } catch (err) {
         console.error('Error registering employee:', err.message);
         res.status(500).json({ error: 'An error occurred while registering user.' });
