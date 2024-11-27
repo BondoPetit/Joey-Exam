@@ -33,9 +33,14 @@ router.post('/login', async (req, res) => {
         
         if (isPasswordValid) {
             console.log('Login successful for user:', username); // Log successful login
+            
+            // Update session to store that the user is an admin
+            req.session.isAdmin = true;
+            req.session.adminId = AdminID; // Ensure consistency in variable naming
+
             res.status(200).json({ 
                 message: 'Login successful',
-                adminID: AdminID, // Send AdminID back to the client if needed
+                adminId: AdminID, // Send AdminID back to the client if needed
                 redirectUrl: '/static/views/admin.html' // Updated redirect URL
             });
         } else {

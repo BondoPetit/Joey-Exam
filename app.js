@@ -13,6 +13,7 @@ const employee_login = require('./Static/controllers/employee_login');
 const quiz_controller = require('./Static/controllers/quiz_controller'); // Importer quiz controller
 const employee_controller = require('./Static/controllers/employee_controller'); // Importer employee controller
 const result_controller = require('./Static/controllers/result_controller'); // Importer result controller
+const admin_controller = require('./Static/controllers/admin_controller'); // Importer admin controller
 const { getPool } = require('./database');
 
 // Middleware setup
@@ -43,7 +44,7 @@ function isAuthenticated(req, res, next) {
     if (req.session && req.session.isAdmin) {
         return next();
     } else {
-        res.status(401).send('Unauthorized: You must log in to access this page.');
+        res.redirect('/Static/views/employee_login.html'); // Redirect to login page if not authenticated
     }
 }
 
@@ -54,16 +55,22 @@ app.get('/', (req, res) => {
   res.sendFile(filePath);
 });
 
-// Generic route to serve any HTML file from Static/views directory
+// Route to serve employee login and register pages
 app.get('/Static/views/:filename', (req, res) => {
+  const allowedFiles = ['employee_login.html', 'start.html', 'employee_register.html'];
   const fileName = req.params.filename;
-  const filePath = path.resolve(__dirname, 'Static/views', fileName);
-  console.log('Serving file from:', filePath);
-  res.sendFile(filePath);
+
+  if (allowedFiles.includes(fileName)) {
+    const filePath = path.resolve(__dirname, 'Static/views', fileName);
+    console.log('Serving file from:', filePath);
+    res.sendFile(filePath);
+  } else {
+    res.status(403).send('Forbidden');
+  }
 });
 
 // Route to serve admin.html only if authenticated
-app.get('/Static/views/admin.html', isAuthenticated, (req, res) => {
+app.get('/admin', isAuthenticated, (req, res) => {
     const filePath = path.resolve(__dirname, 'Static/views/admin.html');
     console.log('Serving file from:', filePath);
     res.sendFile(filePath);
@@ -74,7 +81,8 @@ app.use('/admin_login', admin_login);
 app.use('/employee_login', employee_login);
 app.use('/quiz', quiz_controller); // Brug quiz controlleren
 app.use('/employee', employee_controller); // Simplificér employee controlleren uden ekstra middleware
-app.use('/quiz', result_controller); // Brug result controlleren til quizresultater
+app.use('/result', result_controller); // Brug result controlleren til quizresultater
+app.use('/admin', admin_controller); // Brug admin controlleren til admin specifikke handlinger
 
 // Tilføj logning for at spore anmodninger til admin_login ruten
 app.post('/admin_login/login', (req, res, next) => {

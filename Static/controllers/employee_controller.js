@@ -4,8 +4,55 @@ const sql = require('mssql');
 const router = express.Router();
 const { getPool } = require('../../database');
 
+// Middleware to check if the user is authenticated as an employee
+function isAuthenticated(req, res, next) {
+    console.log('Session Info:', req.session); // Debugging for session information
+    if (req.session && req.session.isEmployee && req.session.employeeId) {
+        return next();
+    } else {
+        res.status(401).json({ error: 'Unauthorized: You must log in as an employee to access this function.' });
+    }
+}
+
+// Route for handling employee login
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required.' });
+    }
+    try {
+        const pool = await getPool();
+        const result = await pool.request()
+            .input('email', sql.NVarChar, email)
+            .query(`
+                SELECT EmployeeID, EmployeePassword
+                FROM Employees
+                WHERE EmployeeEmail = @email
+            `);
+
+        if (result.recordset.length === 0) {
+            return res.status(401).json({ error: 'Invalid credentials.' });
+        }
+
+        const { EmployeeID, EmployeePassword: storedPassword } = result.recordset[0];
+        if (storedPassword !== password) { // You should use a proper hashing method like bcrypt in production
+            return res.status(401).json({ error: 'Invalid credentials.' });
+        }
+
+        // Update session to store that the user is an employee
+        req.session.isEmployee = true;
+        req.session.employeeId = EmployeeID;
+        req.session.employeeEmail = email;
+
+        res.status(200).json({ message: 'Login successful', employeeId: EmployeeID, redirectUrl: '/static/views/employee.html' });
+    } catch (err) {
+        console.error('Error logging in employee:', err.message);
+        res.status(500).json({ error: 'An error occurred while logging in.' });
+    }
+});
+
 // Route for fetching all quizzes for employees
-router.get('/get', async (req, res) => {
+router.get('/get', isAuthenticated, async (req, res) => {
     console.log('GET /employee/get endpoint hit');
     console.log('Fetching quizzes...');
     try {
@@ -58,7 +105,7 @@ router.get('/get', async (req, res) => {
 });
 
 // Route for fetching a specific quiz by ID
-router.get('/get/:id', async (req, res) => {
+router.get('/get/:id', isAuthenticated, async (req, res) => {
     const quizID = req.params.id;
     console.log(`GET /employee/get/${quizID} endpoint hit`);
     console.log('Fetching quiz details...');
@@ -115,7 +162,7 @@ router.get('/get/:id', async (req, res) => {
 });
 
 // Route for saving or updating employee quiz answers
-router.post('/submit', async (req, res) => {
+router.post('/submit', isAuthenticated, async (req, res) => {
     console.log('POST /employee/submit endpoint hit');
     console.log('Saving or updating quiz answers...');
     const { title, employeeId, questions } = req.body;
@@ -203,6 +250,15 @@ router.post('/submit', async (req, res) => {
             }
         }
         res.status(500).json({ error: 'An error occurred while saving or updating quiz answers.' });
+    }
+});
+
+// Route to check who is logged in (accessible to employee only)
+router.get('/whoami', isAuthenticated, async (req, res) => {
+    if (req.session && req.session.isEmployee) {
+        res.status(200).json({ loggedIn: true, userType: 'employee', email: req.session.employeeEmail });
+    } else {
+        res.status(401).json({ loggedIn: false, error: 'Unauthorized' });
     }
 });
 

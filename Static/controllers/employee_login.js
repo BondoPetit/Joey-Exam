@@ -60,8 +60,13 @@ router.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, hashedPassword);
         
         if (isPasswordValid) {
-            // Store employee ID in session storage via frontend
+            // Update session to store that the user is an employee
+            req.session.isEmployee = true;
+            req.session.employeeId = EmployeeID;
+            req.session.employeeEmail = email;
+
             res.status(200).json({
+                message: 'Login successful',
                 employeeId: EmployeeID, // Return employee ID to be stored on frontend
                 redirectUrl: '/static/views/employee.html' // Updated redirect URL
             });
@@ -75,7 +80,6 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Export the router to make the routes accessible from other modules
 // Route for testing database connection
 router.get('/test-db-connection', async (req, res) => {
     try {
