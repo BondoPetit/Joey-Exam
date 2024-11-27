@@ -22,12 +22,44 @@ header {
     color: black;
     padding: 20px 0;
     text-align: center;
+    position: relative;
 }
 
 header h1 {
     margin: 0;
-    font-size: 2.5em;
-    font-weight: 550;
+    font-size: 2.3em;
+    text-align: center;
+    position: relative;
+    transition: font-size 0.3s ease;
+}
+
+#logged-in-user {
+    position: relative;
+    top: 100%;
+    font-size: 1.2em;
+    color: #333;
+    font-weight: bold;
+    transform: translateY(-50%);
+    margin-top: 10px;
+}
+
+#logout-button {
+    position: relative;
+    top: -60px; 
+    left: 81%;
+    background-color: #d387a5b9;
+    color: white;
+    border: none;
+    padding: 10px 10px; /* Reducer padding for at gøre knappen mindre */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em; /* Reducer skriftstørrelsen en smule, hvis nødvendigt */
+    transition: padding 0.3s ease;
+}
+
+
+#logout-button:hover {
+    background-color: #8f2e55;
 }
 
 main {
@@ -158,4 +190,4 @@ button.back-button {
 
 button.back-button:hover {
     background-color: #888888;
-} 
+}
