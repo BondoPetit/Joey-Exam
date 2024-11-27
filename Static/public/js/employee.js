@@ -1,5 +1,28 @@
 // This script is responsible for handling employee login, fetching quizzes from the database, and displaying them for employees to take.
 document.addEventListener('DOMContentLoaded', async () => {
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.style.display = 'block'; // Ensure logout button is visible
+        logoutButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/employee/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    window.location.href = '/static/views/employee_login.html';
+                } else {
+                    alert('Failed to log out. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('An error occurred while logging out.');
+            }
+        });
+    }
     const quizList = document.getElementById('quiz-list');
     const loggedInUserSpan = document.getElementById('logged-in-user');
     let quizzes = []; // Declare quizzes variable to be used globally
