@@ -6,7 +6,7 @@ const router = express.Router();
 const { getPool } = require('../../database');
 
 // Route for fetching all quiz results and statistics
-router.get('/results', async (req, res) => {
+router.get('/', async (req, res) => {  // Updated to root path
     try {
         const pool = await getPool();
         const resultsQuery = await pool.request().query(`
@@ -74,7 +74,7 @@ router.get('/results', async (req, res) => {
 });
 
 // Route for fetching detailed quiz results for a specific quiz and employee
-router.get('/results/:quizTitle/:employeeId', async (req, res) => {
+router.get('/:quizTitle/:employeeId', async (req, res) => {  // Updated to root path
     const { quizTitle, employeeId } = req.params;
     try {
         const pool = await getPool();
