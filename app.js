@@ -81,7 +81,7 @@ app.use('/admin_login', admin_login);
 app.use('/employee_login', employee_login);
 app.use('/quiz', quiz_controller); // Brug quiz controlleren
 app.use('/employee', employee_controller); // Simplificér employee controlleren uden ekstra middleware
-app.use('/result', result_controller); // Brug result controlleren til quizresultater
+app.use('/results', result_controller); // Brug result controlleren til quizresultater (Opdateret path for konsistens)
 app.use('/admin', admin_controller); // Brug admin controlleren til admin specifikke handlinger
 
 // Tilføj logning for at spore anmodninger til admin_login ruten
