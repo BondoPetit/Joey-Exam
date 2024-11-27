@@ -1,7 +1,36 @@
-// This script is responsible for fetching quizzes from the database and displaying them for employees to take.
+// This script is responsible for handling employee login, fetching quizzes from the database, and displaying them for employees to take.
 document.addEventListener('DOMContentLoaded', async () => {
     const quizList = document.getElementById('quiz-list');
+    const loggedInUserSpan = document.getElementById('logged-in-user');
     let quizzes = []; // Declare quizzes variable to be used globally
+
+    // Check who is logged in
+    try {
+        const response = await fetch('/employee/whoami');
+        if (response.ok) {
+            const result = await response.json();
+            if (result.loggedIn && result.userType === 'employee') {
+                // Show the logged in email
+                loggedInUserSpan.textContent = `Logged in as: ${result.email}`;
+            } else {
+                alert('You are not authorized to view this page. Please log in as an employee.');
+                // Redirect to login page
+                window.location.href = `${window.location.origin}/static/views/employee_login.html`;
+                return; // Stop further script execution
+            }
+        } else {
+            alert('Unable to verify login status. Please log in.');
+            // Redirect to login page
+            window.location.href = `${window.location.origin}/static/views/employee_login.html`;
+            return; // Stop further script execution
+        }
+    } catch (error) {
+        console.error('Error checking login status:', error);
+        alert('An error occurred while checking login status. Please log in.');
+        // Redirect to login page
+        window.location.href = `${window.location.origin}/static/views/employee_login.html`;
+        return; // Stop further script execution
+    }
 
     try {
         // Fetch quizzes from the server
