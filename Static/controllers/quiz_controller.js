@@ -4,8 +4,17 @@ const sql = require('mssql');
 const router = express.Router();
 const { getPool } = require('../../database');
 
-// Route for saving a new quiz
-router.post('/save', async (req, res) => {
+// Middleware to check if the user is authenticated
+function isAuthenticated(req, res, next) {
+    if (req.session && req.session.isAdmin) {
+        return next();
+    } else {
+        res.status(401).json({ error: 'Unauthorized: You must log in as an admin to access this function.' });
+    }
+}
+
+// Route for saving a new quiz, accessible only if authenticated
+router.post('/save', isAuthenticated, async (req, res) => {
     const { title, questions } = req.body;
 
     if (!title || !questions || !Array.isArray(questions)) {

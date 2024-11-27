@@ -3,6 +3,7 @@ const path = require('path');
 const cors = require('cors'); // Importer cors middleware
 const bcrypt = require('bcrypt');
 const sql = require('mssql');
+const session = require('express-session'); // Importer express-session til sessionhåndtering
 const app = express();
 const PORT = 3000;
 
@@ -18,6 +19,14 @@ const { getPool } = require('./database');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Setup session middleware
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set secure: true in production with HTTPS
+}));
+
 // Brug CORS middleware for at tillade anmodninger kun fra produktionsdomænet
 app.use(cors({
     origin: ['https://joe-and-the-juice.engineer'], // Tillad kun produktionsdomænet
@@ -28,6 +37,15 @@ app.use(cors({
 
 // Serve static files from Static directory
 app.use('/Static', express.static(path.join(__dirname, 'Static')));
+
+// Middleware to check if the user is authenticated
+function isAuthenticated(req, res, next) {
+    if (req.session && req.session.isAdmin) {
+        return next();
+    } else {
+        res.status(401).send('Unauthorized: You must log in to access this page.');
+    }
+}
 
 // Route to serve the start page at the root URL
 app.get('/', (req, res) => {
@@ -42,6 +60,13 @@ app.get('/Static/views/:filename', (req, res) => {
   const filePath = path.resolve(__dirname, 'Static/views', fileName);
   console.log('Serving file from:', filePath);
   res.sendFile(filePath);
+});
+
+// Route to serve admin.html only if authenticated
+app.get('/Static/views/admin.html', isAuthenticated, (req, res) => {
+    const filePath = path.resolve(__dirname, 'Static/views/admin.html');
+    console.log('Serving file from:', filePath);
+    res.sendFile(filePath);
 });
 
 // Brug controllers til at håndtere login-ruter
