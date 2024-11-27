@@ -74,6 +74,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (response.ok) {
                         const result = await response.json();
+
+                        // Log og gem employeeId i sessionStorage ligesom i login-processen
+                        if (result.employeeId) {
+                            console.log('Employee ID received:', result.employeeId);
+                            sessionStorage.setItem('employeeId', result.employeeId);
+                            console.log('Employee ID saved in sessionStorage');
+                        } else {
+                            console.error('No employeeId found in the response');
+                        }
+
                         if (result.redirectUrl) {
                             window.location.href = result.redirectUrl; // Redirect til employee dashboard
                         }
