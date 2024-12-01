@@ -29,8 +29,13 @@ router.post('/send-verification-code', async (req, res) => {
 
         // Store verification code in the session (or database for a more persistent solution)
         req.session.verificationCode = verificationCode;
-
-        res.status(200).json({ message: 'Verification code sent successfully.' });
+        req.session.save((err) => {
+            if (err) {
+                console.error('Error saving verification code to session:', err);
+                return res.status(500).json({ error: 'An error occurred while saving verification code to session.' });
+            }
+            res.status(200).json({ message: 'Verification code sent successfully.' });
+        });
     } catch (err) {
         console.error('Error sending verification code:', err.message);
         res.status(500).json({ error: 'An error occurred while sending verification code.' });
@@ -47,7 +52,13 @@ router.post('/verify-code', async (req, res) => {
         if (req.session.verificationCode && req.session.verificationCode === parseInt(verificationCode, 10)) {
             // Verification successful, clear the verification code from the session
             delete req.session.verificationCode;
-            res.status(200).json({ message: 'Phone number verified successfully.' });
+            req.session.save((err) => {
+                if (err) {
+                    console.error('Error clearing verification code from session:', err);
+                    return res.status(500).json({ error: 'An error occurred while clearing verification code from session.' });
+                }
+                res.status(200).json({ message: 'Phone number verified successfully.' });
+            });
         } else {
             res.status(400).json({ error: 'Invalid verification code.' });
         }
@@ -82,10 +93,19 @@ router.post('/register', async (req, res) => {
         }
 
         const employeeId = registrationResult.recordset[0].EmployeeID;
-        
         req.session.employeeId = employeeId;
+        req.session.isEmployee = true;
+        req.session.employeeEmail = email;
 
-        res.status(200).json({ message: 'Registration successful.', redirectUrl: '/static/views/employee.html' });
+        // Save the session to ensure it persists
+        req.session.save((err) => {
+            if (err) {
+                console.error('Error saving session:', err);
+                return res.status(500).json({ error: 'An error occurred while saving session.' });
+            }
+            console.log('Session after registration save:', req.session); // Debugging log
+            res.status(200).json({ message: 'Registration successful.', redirectUrl: '/static/views/employee.html' });
+        });
     } catch (err) {
         console.error('Error registering employee:', err.message);
         res.status(500).json({ error: 'An error occurred while registering user.' });
@@ -122,10 +142,20 @@ router.post('/login', async (req, res) => {
             req.session.employeeId = EmployeeID;
             req.session.employeeEmail = email;
 
-            res.status(200).json({
-                message: 'Login successful',
-                employeeId: EmployeeID, // Return employee ID to be stored on frontend
-                redirectUrl: '/static/views/employee.html' // Updated redirect URL
+            console.log('Session before saving:', req.session);  // Log session before saving
+
+            // Save the session to ensure it persists
+            req.session.save((err) => {
+                if (err) {
+                    console.error('Error saving session:', err);
+                    return res.status(500).json({ error: 'An error occurred while saving session.' });
+                }
+                console.log('Session after saving:', req.session); // Log session after saving
+                res.status(200).json({
+                    message: 'Login successful',
+                    employeeId: EmployeeID, // Return employee ID to be stored on frontend
+                    redirectUrl: '/static/views/employee.html' // Updated redirect URL
+                });
             });
         } else {
             console.error('Login failed: Invalid password for email:', email);

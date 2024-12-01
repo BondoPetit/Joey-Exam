@@ -55,6 +55,11 @@ router.post('/login', async (req, res) => {
 router.get('/get', isAuthenticated, async (req, res) => {
     console.log('GET /employee/get endpoint hit');
     console.log('Fetching quizzes...');
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    
     try {
         const pool = await getPool();
         const quizzesResult = await pool.request().query(`
@@ -103,6 +108,7 @@ router.get('/get', isAuthenticated, async (req, res) => {
         res.status(500).json({ error: 'An error occurred while fetching quizzes.' });
     }
 });
+
 
 // Route for fetching a specific quiz by ID
 router.get('/get/:id', isAuthenticated, async (req, res) => {

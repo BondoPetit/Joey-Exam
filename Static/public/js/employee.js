@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                 });
 
-                // Retrieve employeeId from local storage or session storage
+                // Retrieve employeeId from session storage
                 const employeeId = sessionStorage.getItem('employeeId');
                 if (!employeeId) {
                     alert('No employee ID found. Please log in again.');
