@@ -38,16 +38,17 @@ app.use(express.json());
 
 // Setup session middleware
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    secret: process.env.SESSION_SECRET || 'fallback-secret-key', // Brug secret fra .env
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: false, // Sat til false for at undgå problemer med HTTP under udvikling
+        secure: process.env.NODE_ENV === 'production', // True kun for produktion (HTTPS)
         httpOnly: true,
-        sameSite: 'Lax',  // 'Lax' tillader cookies i simple cross-site scenarier, f.eks. navigering fra en anden side
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
         maxAge: 1000 * 60 * 60 // 1 time
     }
 }));
+
 
 
 
