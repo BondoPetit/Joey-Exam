@@ -15,6 +15,7 @@ const quiz_controller = require('./Static/controllers/quiz_controller');
 const employee_controller = require('./Static/controllers/employee_controller');
 const result_controller = require('./Static/controllers/result_controller');
 const admin_controller = require('./Static/controllers/admin_controller');
+const quiz_all_controller = require('./Static/controllers/quiz_all_controller'); // Import new quiz_all controller
 const { getPool } = require('./database');
 
 // Custom middleware to add CORS headers for localhost development and production
@@ -29,8 +30,6 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Credentials", "true");
     next();
 });
-
-
 
 // Middleware setup
 app.use(express.urlencoded({ extended: true }));
@@ -48,12 +47,6 @@ app.use(session({
         maxAge: 1000 * 60 * 60 // 1 time
     }
 }));
-
-
-
-
-
-
 
 // Serve static files from Static directory
 app.use('/Static', express.static(path.join(__dirname, 'Static')));
@@ -102,6 +95,7 @@ app.use('/quiz', quiz_controller);
 app.use('/employee', employee_controller);
 app.use('/results', result_controller);
 app.use('/admin', admin_controller);
+app.use('/quiz', quiz_all_controller); // Use the new quiz_all controller
 
 // Add logging to track requests to admin_login route
 app.post('/admin_login/login', (req, res, next) => {

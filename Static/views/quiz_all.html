@@ -3,19 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Quizzes</title>
-    <link rel="stylesheet" href="/static/styles/admin.css">
+    <title>Joe Admin - Quiz Overview - Quiz_All.html</title>
+    <link rel="stylesheet" href="/static/public/css/nav.css">
+    <link rel="stylesheet" href="/static/public/css/quiz_all.css">
 </head>
 <body>
-    <div id="header">
-        <span id="logged-in-user"></span>
-        <button id="logout-button" style="display: none;">Logout</button>
-    </div>
-    <h1>All Quizzes</h1>
-    <div id="quizzes-container">
-        <!-- Quizzes will be dynamically loaded here -->
-    </div>
+    <img id="corner-logo" src="/static/public/pictures/logo.png" alt="Joe & The Juice Logo">
+    <header>
+        <div id="nav-toggle" class="nav-toggle" style="cursor: pointer; font-size: 2em;">&#9776;</div>
+        <h1>Joe & the Juice - All Quizzes</h1>
     
+        <div id="user-info">
+            <span id="logged-in-user">Logged in as: Admin</span>
+            <button id="logout-button">Logout</button>
+        </div>
+    </header>
+    <nav id="nav-menu" class="nav-menu hidden" style="display: none;">
+        <ul>
+            <li><a href="admin.html">Create New Quiz</a></li>
+            <li><a href="/Static/views/quiz_all.html">Quiz All</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section id="quizzes-section">
+            <h2>All Quizzes</h2>
+            <div id="quizzes-container" aria-live="polite">
+                <!-- Quizzes will be dynamically loaded here -->
+            </div>
+        </section>
+    </main>
+    
+    <script src="/static/public/js/nav.js"></script>
     <script src="/static/public/js/quiz_all.js"></script>
 </body>
 </html>

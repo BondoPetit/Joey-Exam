@@ -1,0 +1,143 @@
+/* logo */
+
+#corner-logo {
+    position: fixed;  /* Gør, at billedet forbliver på plads selv når der scrolles */
+    top: 0px;        /* Placer billedet 20px fra toppen af skærmen */
+    right: 20px;      /* Placer billedet 20px fra højre side af skærmen */
+    width: 100px;     /* Angiv en passende størrelse til billedet */
+    z-index: 5000;    /* Sørger for, at billedet ligger øverst i forhold til andre elementer */
+}
+
+/* quiz_all.css */
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+header {
+    background-color: #ecb4d3;
+    color: black;
+    padding: 20px;
+    position: relative;
+    transition: padding 0.3s ease;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.3em;
+    text-align: center;
+    position: relative;
+    transition: font-size 0.3s ease;
+}
+
+#logged-in-user {
+    position: relative;
+    top: 60%;
+    left: 45%;
+    font-size: 1.2em;
+    color: #333;
+    font-weight: bold;
+    transform: translateY(-50%);
+}
+
+#logout-button {
+    position: relative;
+    top: -30px; 
+    left: 81%;
+    background-color: #d387a5b9;
+    color: white;
+    border: none;
+    padding: 10px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: padding 0.3s ease;
+}
+
+#logout-button:hover {
+    background-color: #8f2e55;
+}
+
+main {
+    padding: 20px;
+}
+
+section#quiz-overview {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+section#quiz-overview h2 {
+    color: black;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.quiz-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    margin-bottom: 10px;
+}
+
+.quiz-item h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: black;
+}
+
+.quiz-item button {
+    background-color: #d387a5b9;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.quiz-item button:hover {
+    background-color: #8f2e55;
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 1.8em;
+    }
+
+    #logged-in-user {
+        font-size: 1em;
+        left: 30%;
+    }
+
+    #logout-button {
+        font-size: 1em;
+        left: 70%;
+        padding: 8px;
+    }
+
+    .quiz-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .quiz-item button {
+        margin-top: 10px;
+    }
+} 

@@ -64,8 +64,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const quizDiv = document.createElement('div');
                 quizDiv.classList.add('quiz-item');
                 quizDiv.innerHTML = `
-                    <h3>${quiz.title}</h3>
-                    <button class="delete-quiz" data-quiz-id="${quiz.id}">Delete</button>
+                    <h3>${quiz.Title}</h3>
+                    <button class="delete-quiz" data-quiz-id="${quiz.QuizID}">Delete</button>
                 `;
                 quizzesContainer.appendChild(quizDiv);
             });
