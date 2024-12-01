@@ -42,12 +42,13 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: process.env.NODE_ENV === 'production', // Kun true i produktion
+        secure: false, // Sat til false for at undgå problemer med HTTP under udvikling
         httpOnly: true,
-        sameSite: 'None',  // None for at tillade cross-site cookies
+        sameSite: 'Lax',  // 'Lax' tillader cookies i simple cross-site scenarier, f.eks. navigering fra en anden side
         maxAge: 1000 * 60 * 60 // 1 time
     }
 }));
+
 
 
 
