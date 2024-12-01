@@ -1,4 +1,5 @@
-// cookie.js - Script for handling cookies in the application
+// cookie.js - Script for handling cookies in the application.
+//Is not currently being used reqally
 
 // Set a cookie with specified name, value, and expiration days
 function setCookie(name, value, days) {
