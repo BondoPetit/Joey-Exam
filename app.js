@@ -38,16 +38,17 @@ app.use(express.json());
 
 // Setup session middleware
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'fallback-secret-key', // Brug secret fra .env
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: process.env.NODE_ENV === 'production', // True kun for produktion (HTTPS)
+        secure: process.env.NODE_ENV === 'production', // True i produktion (HTTPS), False i udvikling
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'Lax' for localhost, 'None' for cross-origin i produktion
         maxAge: 1000 * 60 * 60 // 1 time
     }
 }));
+
 
 
 
@@ -124,3 +125,5 @@ checkDatabaseConnection();
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+console.log('NODE_ENV:', process.env.NODE_ENV);
