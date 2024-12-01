@@ -1,4 +1,4 @@
-// This script is responsible for handling employee login, fetching quizzes from the database, and displaying them for employees to take.
+// This script is responsible for handling employee login, fetching quizzes from the database, and displaying them for employees to take. 
 document.addEventListener('DOMContentLoaded', async () => {
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
@@ -208,10 +208,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         quizzes.forEach((quiz) => {
             const quizDiv = document.createElement('div');
             quizDiv.classList.add('quiz');
+
+            // Add status icon to indicate if the quiz is completed
+            const statusIcon = document.createElement('div');
+            statusIcon.classList.add('status-icon');
+            if (quiz.completed) {
+                statusIcon.innerHTML = '&#x2714;'; // Green checkmark symbol
+                statusIcon.style.backgroundColor = 'green';
+                statusIcon.style.color = 'white';
+            } else {
+                statusIcon.innerHTML = '&#x25CB;'; // Circle symbol
+                statusIcon.style.color = 'grey';
+            }
+            statusIcon.style.position = 'absolute';
+            statusIcon.style.top = '10px';
+            statusIcon.style.right = '10px';
+
             quizDiv.innerHTML = `
                 <h3>${quiz.title}</h3>
                 <button onclick="startQuiz(${quiz.quizID})">Take Quiz</button>
             `;
+            quizDiv.appendChild(statusIcon);
             quizList.appendChild(quizDiv);
         });
     }
