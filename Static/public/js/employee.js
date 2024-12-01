@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
+
     const quizList = document.getElementById('quiz-list');
     const loggedInUserSpan = document.getElementById('logged-in-user');
     let quizzes = []; // Declare quizzes variable to be used globally
@@ -208,6 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         quizzes.forEach((quiz) => {
             const quizDiv = document.createElement('div');
             quizDiv.classList.add('quiz');
+            quizDiv.style.position = 'relative';
 
             // Add status icon to indicate if the quiz is completed
             const statusIcon = document.createElement('div');
@@ -223,12 +225,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             statusIcon.style.position = 'absolute';
             statusIcon.style.top = '10px';
             statusIcon.style.right = '10px';
+            statusIcon.style.width = '25px';
+            statusIcon.style.height = '25px';
+            statusIcon.style.borderRadius = '50%';
+            statusIcon.style.display = 'flex';
+            statusIcon.style.alignItems = 'center';
+            statusIcon.style.justifyContent = 'center';
+            quizDiv.appendChild(statusIcon);
 
-            quizDiv.innerHTML = `
+            quizDiv.innerHTML += `
                 <h3>${quiz.title}</h3>
                 <button onclick="startQuiz(${quiz.quizID})">Take Quiz</button>
             `;
-            quizDiv.appendChild(statusIcon);
             quizList.appendChild(quizDiv);
         });
     }
