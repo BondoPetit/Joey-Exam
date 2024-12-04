@@ -1,8 +1,56 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const resultsList = document.getElementById('results-list');
+    const loggedInUserSpan = document.getElementById('logged-in-user');
+    const logoutButton = document.getElementById('logout-button');
 
+    // Check login status
     try {
-        // Fetch quiz results from the server
+        const response = await fetch('/admin/whoami');
+        if (response.ok) {
+            const result = await response.json();
+            if (result.loggedIn && result.userType === 'admin') {
+                // Show logged-in username
+                loggedInUserSpan.textContent = `Logged in as: ${result.username}`;
+                logoutButton.style.display = 'block';
+            } else {
+                alert('You are not authorized to view this page. Please log in as an admin.');
+                window.location.href = `${window.location.origin}/Static/views/admin_login.html`;
+                return; // Stop further execution
+            }
+        } else {
+            alert('Unable to verify login status. Please log in.');
+            window.location.href = `${window.location.origin}/Static/views/admin_login.html`;
+            return; // Stop further execution
+        }
+    } catch (error) {
+        console.error('Error checking login status:', error);
+        alert('An error occurred while checking login status. Please log in.');
+        window.location.href = `${window.location.origin}/Static/views/admin_login.html`;
+        return; // Stop further execution
+    }
+
+    // Handle logout button
+    logoutButton.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/admin/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (response.ok) {
+                window.location.href = `${window.location.origin}`;
+            } else {
+                alert('Failed to log out. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+            alert('An error occurred while logging out.');
+        }
+    });
+
+    // Fetch quiz results
+    try {
         const response = await fetch('/results'); // Updated URL to be relative
         if (response.status === 401) {
             resultsList.innerHTML = '<p>You must be logged in as an admin to view quiz results.</p>';
@@ -15,14 +63,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const quizResults = await response.json();
 
-        // Add check to ensure quizResults is an array
+        // Check if quizResults is an array
         if (!Array.isArray(quizResults) || quizResults.length === 0) {
             resultsList.innerHTML = '<p>No quiz results available at the moment.</p>';
             return;
         }
 
         quizResults.forEach((quiz, index) => {
-            // Check if quiz and its properties are defined
             if (!quiz || !quiz.title || !Array.isArray(quiz.employeeSummaries)) {
                 console.warn(`Quiz data is missing or incorrect at index ${index}`);
                 return;

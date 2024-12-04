@@ -10,6 +10,7 @@
 
 /* results.css */
 
+
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
@@ -21,14 +22,45 @@ body {
 header {
     background-color: #ecb4d3;
     color: black;
-    padding: 20px 0;
-    text-align: center;
+    padding: 20px;
+    position: relative;
+    transition: padding 0.3s ease;
 }
 
 header h1 {
     margin: 0;
-    font-size: 2.5em;
-    font-weight: 600;
+    font-size: 2.3em;
+    text-align: center;
+    position: relative;
+    transition: font-size 0.3s ease;
+}
+
+#logged-in-user {
+    position: relative;
+    top: 60%;
+    left: 45%;
+    font-size: 1.2em;
+    color: #333;
+    font-weight: bold;
+    transform: translateY(-50%);
+}
+
+#logout-button {
+    position: relative;
+    top: -30px; 
+    left: 81%;
+    background-color: #d387a5b9;
+    color: white;
+    border: none;
+    padding: 10px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: padding 0.3s ease;
+}
+
+#logout-button:hover {
+    background-color: #8f2e55;
 }
 
 main {
