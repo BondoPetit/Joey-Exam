@@ -1,4 +1,3 @@
-employee_controller:
 // Import the required modules
 const express = require('express');
 const sql = require('mssql');
@@ -25,18 +24,18 @@ router.post('/login', async (req, res) => {
         const pool = await getPool();
         const result = await pool.request()
             .input('email', sql.NVarChar, email)
-            .query(
+            .query(`
                 SELECT EmployeeID, EmployeePassword
                 FROM Employees
                 WHERE EmployeeEmail = @email
-            );
+            `);
 
         if (result.recordset.length === 0) {
             return res.status(401).json({ error: 'Invalid credentials.' });
         }
 
         const { EmployeeID, EmployeePassword: storedPassword } = result.recordset[0];
-        if (storedPassword !== password) { // You should use a proper hashing method like bcrypt in production
+        if (storedPassword !== password) { // Use a proper hashing method like bcrypt in production
             return res.status(401).json({ error: 'Invalid credentials.' });
         }
 
@@ -55,22 +54,16 @@ router.post('/login', async (req, res) => {
 // Route for fetching all quizzes for employees
 router.get('/get', isAuthenticated, async (req, res) => {
     console.log('GET /employee/get endpoint hit');
-    console.log('Fetching quizzes...');
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
-    
     try {
         const pool = await getPool();
-        const quizzesResult = await pool.request().query(
+        const quizzesResult = await pool.request().query(`
             SELECT q.QuizID, q.Title, 
                    qs.QuestionID, qs.Text AS QuestionText, 
                    a.AnswerID, a.Text AS AnswerText, a.IsCorrect
             FROM Quizzes q
             LEFT JOIN Questions qs ON q.QuizID = qs.QuizID
             LEFT JOIN Answers a ON qs.QuestionID = a.QuestionID
-        );
+        `);
 
         const records = quizzesResult.recordset;
         const quizzesMap = {};
@@ -110,17 +103,18 @@ router.get('/get', isAuthenticated, async (req, res) => {
     }
 });
 
-
 // Route for fetching a specific quiz by ID
 router.get('/get/:id', isAuthenticated, async (req, res) => {
-    const quizID = req.params.id;
-    console.log(GET /employee/get/${quizID} endpoint hit);
-    console.log('Fetching quiz details...');
+    const quizID = parseInt(req.params.id, 10);
+    if (isNaN(quizID)) {
+        return res.status(400).json({ error: 'Invalid quiz ID.' });
+    }
+    console.log(`GET /employee/get/${quizID} endpoint hit`);
     try {
         const pool = await getPool();
         const quizResult = await pool.request()
             .input('quizID', sql.Int, quizID)
-            .query(
+            .query(`
                 SELECT q.QuizID, q.Title, 
                        qs.QuestionID, qs.Text AS QuestionText, 
                        a.AnswerID, a.Text AS AnswerText, a.IsCorrect
@@ -128,7 +122,7 @@ router.get('/get/:id', isAuthenticated, async (req, res) => {
                 LEFT JOIN Questions qs ON q.QuizID = qs.QuizID
                 LEFT JOIN Answers a ON qs.QuestionID = a.QuestionID
                 WHERE q.QuizID = @quizID
-            );
+            `);
 
         const records = quizResult.recordset;
         if (records.length === 0) {
@@ -171,12 +165,11 @@ router.get('/get/:id', isAuthenticated, async (req, res) => {
 // Route for saving or updating employee quiz answers
 router.post('/submit', isAuthenticated, async (req, res) => {
     console.log('POST /employee/submit endpoint hit');
-    console.log('Saving or updating quiz answers...');
-    const { quizID, title, employeeId, questions } = req.body;
+    const employeeId = req.session.employeeId;
+    const { quizID, title, questions } = req.body;
 
     if (!quizID || !title || !employeeId || !questions || !Array.isArray(questions)) {
-        console.error('Invalid submission data:', req.body);
-        return res.status(400).json({ error: 'Invalid submission data. QuizID, Title, employee ID, and questions are required.' });
+        return res.status(400).json({ error: 'Invalid submission data.' });
     }
 
     let transaction;
@@ -185,83 +178,60 @@ router.post('/submit', isAuthenticated, async (req, res) => {
         transaction = new sql.Transaction(pool);
         await transaction.begin();
 
-        // Check if a result already exists for this quiz and employee
         const existingResult = await pool.request()
             .input('quizID', sql.Int, quizID)
-            .input('employeeId', sql.NVarChar, employeeId)
-            .query(
+            .input('employeeId', sql.Int, employeeId)
+            .query(`
                 SELECT ResultID
                 FROM EmployeeResults
                 WHERE QuizID = @quizID AND EmployeeID = @employeeId
-            );
+            `);
 
         let resultID;
         if (existingResult.recordset.length > 0) {
-            // If a result already exists, delete old answers
             resultID = existingResult.recordset[0].ResultID;
             await pool.request()
                 .input('resultID', sql.Int, resultID)
-                .query(
+                .query(`
                     DELETE FROM EmployeeAnswers
                     WHERE ResultID = @resultID
-                );
-            console.log(Existing result found for EmployeeID ${employeeId}, deleting old answers...);
+                `);
         } else {
-            // If no result exists, insert a new one
-            const resultRequest = new sql.Request(transaction);
-            const result = await resultRequest
-                .input('quizID', sql.Int, quizID) // Include QuizID
+            const result = await pool.request()
+                .input('quizID', sql.Int, quizID)
                 .input('title', sql.NVarChar, title)
-                .input('employeeId', sql.NVarChar, employeeId)
-                .query(
+                .input('employeeId', sql.Int, employeeId)
+                .query(`
                     INSERT INTO EmployeeResults (QuizID, Title, EmployeeID)
                     OUTPUT inserted.ResultID
                     VALUES (@quizID, @title, @employeeId)
-                );
-
-            if (!result.recordset || result.recordset.length === 0) {
-                throw new Error('Failed to insert into EmployeeResults. No result ID returned.');
-            }
+                `);
             resultID = result.recordset[0].ResultID;
-            console.log(New result created with ResultID ${resultID} for EmployeeID ${employeeId});
         }
 
-        // Insert new answers into EmployeeAnswers
         for (let question of questions) {
-            if (!question.text || !question.employeeAnswer) {
-                console.error('Invalid question data:', question);
-                throw new Error('Invalid question data. Each question must have text and an employee answer.');
-            }
-
-            const answerRequest = new sql.Request(transaction);
-            await answerRequest
+            await pool.request()
                 .input('resultID', sql.Int, resultID)
-                .input('quizID', sql.Int, quizID) // Include QuizID
+                .input('quizID', sql.Int, quizID)
                 .input('questionText', sql.NVarChar, question.text)
-                .input('employeeAnswer', sql.NVarChar, question.employeeAnswer)
+                .input('employeeAnswer', sql.NVarChar, question.employeeAnswer || 'No answer')
                 .input('correctAnswer', sql.NVarChar, question.correctAnswer || null)
-                .query(
+                .query(`
                     INSERT INTO EmployeeAnswers (ResultID, QuizID, QuestionText, EmployeeAnswer, CorrectAnswer)
                     VALUES (@resultID, @quizID, @questionText, @employeeAnswer, @correctAnswer)
-                );
+                `);
         }
 
         await transaction.commit();
         res.status(201).json({ message: 'Quiz answers saved successfully.' });
     } catch (err) {
-        console.error('Error saving or updating quiz answers:', err.message);
+        console.error('Error saving quiz answers:', err.message);
         if (transaction) {
-            try {
-                await transaction.rollback();
-                console.error('Transaction rolled back due to an error.');
-            } catch (rollbackError) {
-                console.error('Error rolling back transaction:', rollbackError.message);
-            }
+            await transaction.rollback();
         }
-        res.status(500).json({ error: 'An error occurred while saving or updating quiz answers.' });
+        res.status(500).json({ error: 'An error occurred while saving quiz answers.' });
     }
 });
-
 
 // Route to logout employee
 router.post('/logout', isAuthenticated, (req, res) => {
@@ -273,15 +243,18 @@ router.post('/logout', isAuthenticated, (req, res) => {
     });
 });
 
-// Route to check who is logged in (accessible to employee only)
-router.get('/whoami', isAuthenticated, async (req, res) => {
+// Route to check who is logged in
+router.get('/whoami', isAuthenticated, (req, res) => {
     if (req.session && req.session.isEmployee) {
-        res.status(200).json({ loggedIn: true, userType: 'employee', email: req.session.employeeEmail });
+        res.status(200).json({
+            loggedIn: true,
+            userType: 'employee',
+            email: req.session.employeeEmail
+        });
     } else {
-        res.status(401).json({ loggedIn: false, error: 'Unauthorized' });
+        res.status(401).json({ error: 'Unauthorized' });
     }
 });
 
-
-// Export the router to make the routes accessible from other modules
+// Export the router
 module.exports = router;
