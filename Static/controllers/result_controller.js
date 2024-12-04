@@ -5,8 +5,17 @@ const sql = require('mssql');
 const router = express.Router();
 const { getPool } = require('../../database');
 
+// Middleware to check if the user is authenticated
+function isAuthenticated(req, res, next) {
+    if (req.session && req.session.isAdmin) {
+        return next();
+    } else {
+        res.status(401).json({ error: 'Unauthorized: You must log in as an admin to access this function.' });
+    }
+}
+
 // Route for fetching all quiz results and statistics
-router.get('/', async (req, res) => {  // Updated to root path
+router.get('/', isAuthenticated, async (req, res) => {  // Middleware applied here
     try {
         const pool = await getPool();
         const resultsQuery = await pool.request().query(`
@@ -40,7 +49,7 @@ router.get('/', async (req, res) => {  // Updated to root path
                 currentQuiz.results.push(existingResult);
             }
 
-            // Push question details only if they are not already in the list
+            // Push question details
             const isCorrect = row.EmployeeAnswer === row.CorrectAnswer;
             existingResult.questions.push({
                 text: row.QuestionText,
@@ -74,7 +83,7 @@ router.get('/', async (req, res) => {  // Updated to root path
 });
 
 // Route for fetching detailed quiz results for a specific quiz and employee
-router.get('/:quizTitle/:employeeId', async (req, res) => {  // Updated to root path
+router.get('/:quizTitle/:employeeId', isAuthenticated, async (req, res) => {  // Middleware applied here
     const { quizTitle, employeeId } = req.params;
     try {
         const pool = await getPool();

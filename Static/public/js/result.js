@@ -4,6 +4,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Fetch quiz results from the server
         const response = await fetch('/results'); // Updated URL to be relative
+        if (response.status === 401) {
+            resultsList.innerHTML = '<p>You must be logged in as an admin to view quiz results.</p>';
+            return;
+        }
+
         if (!response.ok) {
             throw new Error('Failed to fetch quiz results from the server');
         }

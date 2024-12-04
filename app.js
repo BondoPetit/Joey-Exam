@@ -1,8 +1,7 @@
 require('dotenv').config(); // Load .env file at the top
 
-const express = require('express'); 
+const express = require('express');
 const path = require('path');
-const bcrypt = require('bcrypt');
 const sql = require('mssql');
 const session = require('express-session'); // Import express-session to manage sessions
 const app = express();
@@ -40,7 +39,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: false,
-    cookie: { 
+    cookie: {
         secure: process.env.NODE_ENV === 'production', // True i produktion (HTTPS), False i udvikling
         httpOnly: true,
         sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'Lax' for localhost, 'None' for cross-origin i produktion
@@ -93,7 +92,7 @@ app.use('/admin_login', admin_login);
 app.use('/employee_login', employee_login);
 app.use('/quiz', quiz_controller);
 app.use('/employee', employee_controller);
-app.use('/results', result_controller);
+app.use('/results', isAuthenticated, result_controller); // Protect results route
 app.use('/admin', admin_controller);
 app.use('/quiz', quiz_all_controller); // Use the new quiz_all controller
 
