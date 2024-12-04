@@ -97,12 +97,32 @@ router.delete('/delete/:quizId', isAuthenticated, async (req, res) => {
         const transaction = new sql.Transaction(pool);
         await transaction.begin();
 
+        // Delete employee answers related to the quiz
+        await transaction.request()
+            .input('quizId', sql.Int, quizId)
+            .query(`
+                DELETE FROM EmployeeAnswers 
+                WHERE ResultID IN (
+                    SELECT ResultID FROM EmployeeResults WHERE QuizID = @quizId
+                )
+            `);
+
+        // Delete employee results related to the quiz
+        await transaction.request()
+            .input('quizId', sql.Int, quizId)
+            .query(`
+                DELETE FROM EmployeeResults 
+                WHERE QuizID = @quizId
+            `);
+
         // Delete all answers related to questions of the quiz
         await transaction.request()
             .input('quizId', sql.Int, quizId)
             .query(`
                 DELETE FROM Answers 
-                WHERE QuestionID IN (SELECT QuestionID FROM Questions WHERE QuizID = @quizId)
+                WHERE QuestionID IN (
+                    SELECT QuestionID FROM Questions WHERE QuizID = @quizId
+                )
             `);
 
         // Delete all questions related to the quiz
@@ -122,7 +142,7 @@ router.delete('/delete/:quizId', isAuthenticated, async (req, res) => {
             `);
 
         await transaction.commit();
-        res.status(200).json({ message: 'Quiz deleted successfully.' });
+        res.status(200).json({ message: 'Quiz and related data deleted successfully.' });
     } catch (err) {
         console.error('Error deleting quiz:', err.message);
         try {
@@ -134,6 +154,7 @@ router.delete('/delete/:quizId', isAuthenticated, async (req, res) => {
         res.status(500).json({ error: 'An error occurred while deleting the quiz.' });
     }
 });
+
 
 // Export the router to make the routes accessible from other modules
 module.exports = router;

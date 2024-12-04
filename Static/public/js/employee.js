@@ -35,24 +35,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             const result = await response.json();
             if (result.loggedIn && result.userType === 'employee') {
                 // Show the logged in email
-                loggedInUserSpan.textContent = `Logged in as: ${result.email}`;
+                loggedInUserSpan.textContent = Logged in as: ${ result.email };
             } else {
                 alert('You are not authorized to view this page. Please log in as an employee.');
                 // Redirect to login page
-                window.location.href = `${window.location.origin}/static/views/employee_login.html`;
+                window.location.href = ${ window.location.origin } /static/views / employee_login.html;
                 return; // Stop further script execution
             }
         } else {
             alert('Unable to verify login status. Please log in.');
             // Redirect to login page
-            window.location.href = `${window.location.origin}/static/views/employee_login.html`;
+            window.location.href = ${ window.location.origin } /static/views / employee_login.html;
             return; // Stop further script execution
         }
     } catch (error) {
         console.error('Error checking login status:', error);
         alert('An error occurred while checking login status. Please log in.');
         // Redirect to login page
-        window.location.href = `${window.location.origin}/static/views/employee_login.html`;
+        window.location.href = ${ window.location.origin } /static/views / employee_login.html;
         return; // Stop further script execution
     }
 
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to handle quiz taking
     window.startQuiz = async function (quizID) {
         try {
-            const response = await fetch(`/employee/get/${quizID}`, { credentials: 'include' });
+            const response = await fetch(/employee/get / ${ quizID }, { credentials: 'include' });
             if (!response.ok) {
                 throw new Error('Failed to fetch quiz details from the server');
             }
@@ -86,22 +86,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             const quiz = await response.json();
             const quizContainer = document.createElement('div');
             quizContainer.classList.add('quiz-container');
-            quizContainer.innerHTML = `<h3>${quiz.title}</h3>`;
+            quizContainer.innerHTML = <h3>${quiz.title}</h3>;
 
             quiz.questions.forEach((question, qIndex) => {
                 const questionDiv = document.createElement('div');
                 questionDiv.classList.add('question');
-                questionDiv.innerHTML = `
+                questionDiv.innerHTML =
                     <p><strong>Question ${qIndex + 1}: </strong>${question.text}</p>
-                `;
+                    ;
                 question.answers.forEach((answer, aIndex) => {
                     const answerLabel = document.createElement('label');
                     const answerInput = document.createElement('input');
                     answerInput.type = 'radio';
-                    answerInput.name = `question-${qIndex}`;
+                    answerInput.name = question - ${ qIndex };
                     answerInput.value = answer.text;
                     answerLabel.appendChild(answerInput);
-                    answerLabel.append(` ${answer.text}`);
+                    answerLabel.append(${ answer.text });
                     questionDiv.appendChild(answerLabel);
                     questionDiv.appendChild(document.createElement('br'));
                 });
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Gather results from the quiz
                 const employeeAnswers = [];
                 quiz.questions.forEach((question, qIndex) => {
-                    const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
+                    const selectedAnswer = document.querySelector(input[name = "question-${qIndex}"]: checked);
                     employeeAnswers.push({
                         text: question.text,
                         employeeAnswer: selectedAnswer ? selectedAnswer.value : "No answer",
@@ -145,26 +145,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // Create result object
                 const result = {
+                    quizID: quiz.quizID, // Include quizID here
                     title: quiz.title,
-                    employeeId: employeeId, // Use actual employee ID from session
+                    employeeId: employeeId,
                     questions: employeeAnswers
                 };
 
                 // Send the result to the server to save in the database
                 try {
-                    const response = await fetch('/employee/submit', { 
+                    const response = await fetch('/employee/submit', {
                         credentials: 'include',
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(result)
-                    });                    
+                    });
 
                     if (response.ok) {
                         // Show feedback after submission
                         quiz.questions.forEach((question, qIndex) => {
-                            const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
+                            const selectedAnswer = document.querySelector(input[name = "question-${qIndex}"]: checked);
                             const questionDiv = document.querySelectorAll('.question')[qIndex];
                             const feedbackDiv = document.createElement('div');
                             feedbackDiv.classList.add('feedback');
@@ -190,6 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     alert('An error occurred while submitting the quiz.');
                 }
             };
+
             buttonContainer.appendChild(submitButton);
 
             // Append button container after questions
@@ -233,10 +235,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             statusIcon.style.justifyContent = 'center';
             quizDiv.appendChild(statusIcon);
 
-            quizDiv.innerHTML += `
+            quizDiv.innerHTML += 
                 <h3>${quiz.title}</h3>
                 <button onclick="startQuiz(${quiz.quizID})">Take Quiz</button>
-            `;
+                ;
             quizList.appendChild(quizDiv);
         });
     }

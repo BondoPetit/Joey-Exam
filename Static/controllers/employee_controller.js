@@ -1,3 +1,4 @@
+employee_controller:
 // Import the required modules
 const express = require('express');
 const sql = require('mssql');
@@ -24,11 +25,11 @@ router.post('/login', async (req, res) => {
         const pool = await getPool();
         const result = await pool.request()
             .input('email', sql.NVarChar, email)
-            .query(`
+            .query(
                 SELECT EmployeeID, EmployeePassword
                 FROM Employees
                 WHERE EmployeeEmail = @email
-            `);
+            );
 
         if (result.recordset.length === 0) {
             return res.status(401).json({ error: 'Invalid credentials.' });
@@ -62,14 +63,14 @@ router.get('/get', isAuthenticated, async (req, res) => {
     
     try {
         const pool = await getPool();
-        const quizzesResult = await pool.request().query(`
+        const quizzesResult = await pool.request().query(
             SELECT q.QuizID, q.Title, 
                    qs.QuestionID, qs.Text AS QuestionText, 
                    a.AnswerID, a.Text AS AnswerText, a.IsCorrect
             FROM Quizzes q
             LEFT JOIN Questions qs ON q.QuizID = qs.QuizID
             LEFT JOIN Answers a ON qs.QuestionID = a.QuestionID
-        `);
+        );
 
         const records = quizzesResult.recordset;
         const quizzesMap = {};
@@ -113,13 +114,13 @@ router.get('/get', isAuthenticated, async (req, res) => {
 // Route for fetching a specific quiz by ID
 router.get('/get/:id', isAuthenticated, async (req, res) => {
     const quizID = req.params.id;
-    console.log(`GET /employee/get/${quizID} endpoint hit`);
+    console.log(GET /employee/get/${quizID} endpoint hit);
     console.log('Fetching quiz details...');
     try {
         const pool = await getPool();
         const quizResult = await pool.request()
             .input('quizID', sql.Int, quizID)
-            .query(`
+            .query(
                 SELECT q.QuizID, q.Title, 
                        qs.QuestionID, qs.Text AS QuestionText, 
                        a.AnswerID, a.Text AS AnswerText, a.IsCorrect
@@ -127,7 +128,7 @@ router.get('/get/:id', isAuthenticated, async (req, res) => {
                 LEFT JOIN Questions qs ON q.QuizID = qs.QuizID
                 LEFT JOIN Answers a ON qs.QuestionID = a.QuestionID
                 WHERE q.QuizID = @quizID
-            `);
+            );
 
         const records = quizResult.recordset;
         if (records.length === 0) {
@@ -171,11 +172,11 @@ router.get('/get/:id', isAuthenticated, async (req, res) => {
 router.post('/submit', isAuthenticated, async (req, res) => {
     console.log('POST /employee/submit endpoint hit');
     console.log('Saving or updating quiz answers...');
-    const { title, employeeId, questions } = req.body;
+    const { quizID, title, employeeId, questions } = req.body;
 
-    if (!title || !employeeId || !questions || !Array.isArray(questions)) {
+    if (!quizID || !title || !employeeId || !questions || !Array.isArray(questions)) {
         console.error('Invalid submission data:', req.body);
-        return res.status(400).json({ error: 'Invalid submission data. Title, employee ID, and questions are required.' });
+        return res.status(400).json({ error: 'Invalid submission data. QuizID, Title, employee ID, and questions are required.' });
     }
 
     let transaction;
@@ -184,47 +185,48 @@ router.post('/submit', isAuthenticated, async (req, res) => {
         transaction = new sql.Transaction(pool);
         await transaction.begin();
 
-        // Tjek, om der allerede findes et resultat for denne quiz og medarbejder
+        // Check if a result already exists for this quiz and employee
         const existingResult = await pool.request()
-            .input('title', sql.NVarChar, title)
+            .input('quizID', sql.Int, quizID)
             .input('employeeId', sql.NVarChar, employeeId)
-            .query(`
+            .query(
                 SELECT ResultID
                 FROM EmployeeResults
-                WHERE Title = @title AND EmployeeID = @employeeId
-            `);
+                WHERE QuizID = @quizID AND EmployeeID = @employeeId
+            );
 
         let resultID;
         if (existingResult.recordset.length > 0) {
-            // Hvis et resultat allerede findes, slet gamle svar
+            // If a result already exists, delete old answers
             resultID = existingResult.recordset[0].ResultID;
             await pool.request()
                 .input('resultID', sql.Int, resultID)
-                .query(`
+                .query(
                     DELETE FROM EmployeeAnswers
                     WHERE ResultID = @resultID
-                `);
-            console.log(`Existing result found for EmployeeID ${employeeId}, deleting old answers...`);
+                );
+            console.log(Existing result found for EmployeeID ${employeeId}, deleting old answers...);
         } else {
-            // Hvis der ikke findes et resultat, indsæt et nyt
+            // If no result exists, insert a new one
             const resultRequest = new sql.Request(transaction);
             const result = await resultRequest
+                .input('quizID', sql.Int, quizID) // Include QuizID
                 .input('title', sql.NVarChar, title)
                 .input('employeeId', sql.NVarChar, employeeId)
-                .query(`
-                    INSERT INTO EmployeeResults (Title, EmployeeID)
+                .query(
+                    INSERT INTO EmployeeResults (QuizID, Title, EmployeeID)
                     OUTPUT inserted.ResultID
-                    VALUES (@title, @employeeId)
-                `);
+                    VALUES (@quizID, @title, @employeeId)
+                );
 
             if (!result.recordset || result.recordset.length === 0) {
                 throw new Error('Failed to insert into EmployeeResults. No result ID returned.');
             }
             resultID = result.recordset[0].ResultID;
-            console.log(`New result created with ResultID ${resultID} for EmployeeID ${employeeId}`);
+            console.log(New result created with ResultID ${resultID} for EmployeeID ${employeeId});
         }
 
-        // Indsæt de nye svar i EmployeeAnswers
+        // Insert new answers into EmployeeAnswers
         for (let question of questions) {
             if (!question.text || !question.employeeAnswer) {
                 console.error('Invalid question data:', question);
@@ -234,13 +236,14 @@ router.post('/submit', isAuthenticated, async (req, res) => {
             const answerRequest = new sql.Request(transaction);
             await answerRequest
                 .input('resultID', sql.Int, resultID)
+                .input('quizID', sql.Int, quizID) // Include QuizID
                 .input('questionText', sql.NVarChar, question.text)
                 .input('employeeAnswer', sql.NVarChar, question.employeeAnswer)
                 .input('correctAnswer', sql.NVarChar, question.correctAnswer || null)
-                .query(`
-                    INSERT INTO EmployeeAnswers (ResultID, QuestionText, EmployeeAnswer, CorrectAnswer)
-                    VALUES (@resultID, @questionText, @employeeAnswer, @correctAnswer)
-                `);
+                .query(
+                    INSERT INTO EmployeeAnswers (ResultID, QuizID, QuestionText, EmployeeAnswer, CorrectAnswer)
+                    VALUES (@resultID, @quizID, @questionText, @employeeAnswer, @correctAnswer)
+                );
         }
 
         await transaction.commit();
@@ -258,6 +261,7 @@ router.post('/submit', isAuthenticated, async (req, res) => {
         res.status(500).json({ error: 'An error occurred while saving or updating quiz answers.' });
     }
 });
+
 
 // Route to logout employee
 router.post('/logout', isAuthenticated, (req, res) => {
@@ -277,6 +281,7 @@ router.get('/whoami', isAuthenticated, async (req, res) => {
         res.status(401).json({ loggedIn: false, error: 'Unauthorized' });
     }
 });
+
 
 // Export the router to make the routes accessible from other modules
 module.exports = router;
