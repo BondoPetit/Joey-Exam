@@ -7,14 +7,15 @@
     <link rel="stylesheet" href="/static/public/css/employee.css">
 </head>
 <body>
-    <img id="corner-logo" src="/static/public/pictures/logo.png" alt="Joe & The Juice Logo">
     <header>
+        <img id="corner-logo" src="/static/public/pictures/logo.png" alt="Joe & The Juice Logo">
         <h1>Joe & the Juice - Skill Check</h1>
-        <div id="logged-in-user">
-            <!-- The logged in user's email will be displayed here -->
+        <div id="user-info">
+            <span id="logged-in-user"><!-- User email --></span>
+            <button id="logout-button">Logout</button>
         </div>
-        <button id="logout-button">Logout</button>
     </header>
+    
     <main>
         <section id="available-quizzes">
             <h2>Available Quizzes</h2>
