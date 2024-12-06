@@ -131,23 +131,42 @@ main {
     min-height: calc(100vh - 60px);
 }
 
-/* Form section */
-section#create-quiz {
-    background-color: rgba(255, 255, 255, 0.9); /* Let gennemsigtighed */
+
+/* Center indholdet af den store container */
+#create-quiz {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrér alt horisontalt */
+    justify-content: center; /* Hvis der er behov for vertikal centrering */
     padding: 30px;
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     max-width: 600px;
-    width: 90%;
     margin: auto;
+    box-sizing: border-box;
 }
 
-section#create-quiz h2 {
-    color: #333;
-    font-size: 1.6em;
-    margin-bottom: 20px;
-    text-align: center;
+/* Gør quiz-titlen centreret */
+#create-quiz label[for="quiz-title"],
+#create-quiz #quiz-title {
+    display: block;
+    width: 100%; /* Brug hele containerens bredde */
+    max-width: 500px; /* Begræns bredden, så det ser godt ud */
+    margin: 0 auto; /* Centrér feltet horisontalt */
+    text-align: center; /* Sørg for labelens tekst er centreret */
 }
+
+#create-quiz #quiz-title {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+
+
 
 /* Inputs and buttons */
 form#quiz-form input[type="text"],
@@ -177,6 +196,31 @@ form#quiz-form button:hover {
     background-color: #555;
     transform: scale(1.05);
 }
+
+#questions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Afstand mellem spørgsmål */
+    overflow: hidden; /* Forhindrer elementer i at gå udenfor containeren */
+}
+
+.question-separator {
+    margin-top: 20px; /* Afstand mellem spørgsmål */
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 100%; /* Sørg for, at hvert spørgsmål ikke overskrider containerens bredde */
+    box-sizing: border-box; /* Medregn padding og border i elementets bredde */
+}
+
+.question-separator input {
+    width: 100%; /* Sørg for, at input-felterne ikke overskrider containerens bredde */
+    box-sizing: border-box; /* Medregn padding og border i input-felternes bredde */
+}
+
+
 
 /* Responsivitet */
 @media (max-width: 768px) {

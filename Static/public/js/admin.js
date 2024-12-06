@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     addQuestionButton.addEventListener('click', () => {
         questionCount++;
         const questionDiv = document.createElement('div');
-        questionDiv.classList.add('question');
+        questionDiv.classList.add('question', 'question-separator'); // Tilføjer en ny klasse for adskillelse
         questionDiv.setAttribute('data-question-id', questionCount);
         
         questionDiv.innerHTML = `
@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         questionsContainer.appendChild(questionDiv);
     });
+    
 
     quizForm.addEventListener('submit', async (event) => {
         event.preventDefault();

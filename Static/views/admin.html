@@ -26,22 +26,23 @@
             <h2>Create a New Quiz</h2>
             <form id="quiz-form">
                 <label for="quiz-title">Quiz Title:</label>
-                <input type="text" id="quiz-title" name="quiz-title" required minlength="10" placeholder="Quiz title must be at least 10 characters long">
+                <input type="text" id="quiz-title" name="quiz-title" required minlength="4" placeholder="Quiz title must be at least 4 characters long">
                 
                 <div id="questions-container">
                     <h3>Questions</h3>
-                    <div class="question" data-question-id="1">
+                    <!-- Første spørgsmål med visuel adskillelse -->
+                    <div class="question question-separator" data-question-id="1">
                         <label for="question-1">Question 1:</label>
-                        <input type="text" id="question-1" name="question-1" required>
+                        <input type="text" id="question-1" name="question-1" required placeholder="Be creative">
                         
                         <label for="answer-1-1">Answer 1:</label>
-                        <input type="text" id="answer-1-1" name="answer-1-1" required>
+                        <input type="text" id="answer-1-1" name="answer-1-1" required placeholder="Be better">
                         
                         <label for="answer-1-2">Answer 2:</label>
-                        <input type="text" id="answer-1-2" name="answer-1-2" required>
+                        <input type="text" id="answer-1-2" name="answer-1-2" required placeholder="Be a Bee or Bee not">
                         
                         <label for="answer-1-3">Answer 3:</label>
-                        <input type="text" id="answer-1-3" name="answer-1-3" required>
+                        <input type="text" id="answer-1-3" name="answer-1-3" required placeholder="Bzzzz">
                         
                         <label for="correct-answer-1">Correct Answer:</label>
                         <input type="number" id="correct-answer-1" name="correct-answer-1" min="1" max="3" required>
