@@ -1,5 +1,5 @@
 // Import the required modules
-require('dotenv').config(); // Dette skal være øverst for at læse .env filen
+require('dotenv').config(); // This should be at the top to load .env file
 const express = require('express');
 const sql = require('mssql');
 const bcrypt = require('bcrypt');
@@ -7,10 +7,13 @@ const router = express.Router();
 const { getPool } = require('../../database');
 const twilio = require('twilio');
 
-// Twilio credentials (these should be stored securely, e.g., in environment variables)
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = twilio(accountSid, authToken);
+// Twilio credentials
+const accountSid = process.env.TWILIO_ACCOUNT_SID; // Primary Account SID
+const apiKeySid = process.env.TWILIO_API_KEY_SID; // API Key SID
+const apiKeySecret = process.env.TWILIO_API_KEY_SECRET; // API Key Secret
+
+// Initialize Twilio client with API Key
+const client = twilio(apiKeySid, apiKeySecret, { accountSid });
 
 // Route for sending SMS verification code
 router.post('/send-verification-code', async (req, res) => {
@@ -19,7 +22,6 @@ router.post('/send-verification-code', async (req, res) => {
         return res.status(400).json({ error: 'Phone number is required.' });
     }
     try {
-        // Send SMS verification code using Twilio
         const verificationCode = Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit code
         await client.messages.create({
             body: `Your verification code is: ${verificationCode}`,
@@ -27,7 +29,6 @@ router.post('/send-verification-code', async (req, res) => {
             to: phoneNumber
         });
 
-        // Store verification code in the session (or database for a more persistent solution)
         req.session.verificationCode = verificationCode;
         req.session.save((err) => {
             if (err) {
@@ -50,8 +51,7 @@ router.post('/verify-code', async (req, res) => {
     }
     try {
         if (req.session.verificationCode && req.session.verificationCode === parseInt(verificationCode, 10)) {
-            // Verification successful, clear the verification code from the session
-            delete req.session.verificationCode;
+            delete req.session.verificationCode; // Clear verification code after successful verification
             req.session.save((err) => {
                 if (err) {
                     console.error('Error clearing verification code from session:', err);
@@ -68,7 +68,7 @@ router.post('/verify-code', async (req, res) => {
     }
 });
 
-// Route for handling employee registration
+// Route for employee registration
 router.post('/register', async (req, res) => {
     const { email, password, phoneNumber } = req.body;
     if (!email || !password || !phoneNumber) {
@@ -86,9 +86,8 @@ router.post('/register', async (req, res) => {
                 OUTPUT inserted.EmployeeID
                 VALUES (@email, @password, @phoneNumber)
             `);
-        
+
         if (registrationResult.recordset.length === 0) {
-            console.error('Registration failed: No record inserted.');
             throw new Error('Failed to register employee.');
         }
 
@@ -97,13 +96,11 @@ router.post('/register', async (req, res) => {
         req.session.isEmployee = true;
         req.session.employeeEmail = email;
 
-        // Save the session to ensure it persists
         req.session.save((err) => {
             if (err) {
                 console.error('Error saving session:', err);
                 return res.status(500).json({ error: 'An error occurred while saving session.' });
             }
-            console.log('Session after registration save:', req.session); // Debugging log
             res.status(200).json({ message: 'Registration successful.', redirectUrl: '/static/views/employee.html' });
         });
     } catch (err) {
@@ -112,7 +109,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Route for handling employee login
+// Route for employee login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -127,60 +124,36 @@ router.post('/login', async (req, res) => {
                 FROM Employees
                 WHERE EmployeeEmail = @email
             `);
-        
+
         if (result.recordset.length === 0) {
-            console.error('Login failed: No matching user found for email:', email);
             return res.status(401).json({ error: 'Invalid employee credentials.' });
         }
-        
+
         const { EmployeeID, EmployeePassword: hashedPassword } = result.recordset[0];
         const isPasswordValid = await bcrypt.compare(password, hashedPassword);
-        
+
         if (isPasswordValid) {
-            // Update session to store that the user is an employee
             req.session.isEmployee = true;
             req.session.employeeId = EmployeeID;
             req.session.employeeEmail = email;
 
-            console.log('Session before saving:', req.session);  // Log session before saving
-
-            // Save the session to ensure it persists
             req.session.save((err) => {
                 if (err) {
                     console.error('Error saving session:', err);
                     return res.status(500).json({ error: 'An error occurred while saving session.' });
                 }
-                console.log('Session after saving:', req.session); // Log session after saving
                 res.status(200).json({
                     message: 'Login successful',
-                    employeeId: EmployeeID, // Return employee ID to be stored on frontend
-                    redirectUrl: '/static/views/employee.html' // Updated redirect URL
+                    employeeId: EmployeeID,
+                    redirectUrl: '/static/views/employee.html'
                 });
             });
         } else {
-            console.error('Login failed: Invalid password for email:', email);
             res.status(401).json({ error: 'Invalid employee credentials.' });
         }
     } catch (err) {
         console.error('Error logging in employee:', err.message);
         res.status(500).json({ error: 'An error occurred while logging in.' });
-    }
-});
-
-// Route for testing database connection
-router.get('/test-db-connection', async (req, res) => {
-    try {
-        const pool = await getPool();
-        const result = await pool.request().query('SELECT 1 AS isConnected');
-        
-        if (result.recordset.length > 0) {
-            res.status(200).json({ message: 'Database connection successful!' });
-        } else {
-            res.status(500).json({ error: 'Database connection failed.' });
-        }
-    } catch (err) {
-        console.error('Error connecting to the database:', err.message);
-        res.status(500).json({ error: 'An error occurred while connecting to the database.' });
     }
 });
 
