@@ -4,26 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Joe Admin - Quiz Creator</title>
-    <link rel="stylesheet" href="/static/public/css/nav.css">
     <link rel="stylesheet" href="/static/public/css/admin.css">
 </head>
 <body>
-    <img id="corner-logo" src="/static/public/pictures/logo.png" alt="Joe & The Juice Logo">
-
     <header>
-        <div id="nav-toggle" class="nav-toggle" style="cursor: pointer; font-size: 2em;">&#9776;</div>
+        <img id="corner-logo" src="/static/public/pictures/logo.png" alt="Joe & The Juice Logo">
         <h1>Joe & the Juice - Skill Check</h1>
+        <div id="nav-links">
+            <ul>
+                <li><a href="/Static/views/quiz_all.html">Quiz All</a></li>
+                <li><a href="/Static/views/result.html">Quiz Results</a></li>
+            </ul>
+        </div>
         <div id="user-info">
             <span id="logged-in-user">Logged in as: Admin</span>
             <button id="logout-button">Logout</button>
         </div>
     </header>
-    <nav id="nav-menu" class="nav-menu hidden">
-        <ul>
-            <li><a href="/Static/views/quiz_all.html">Quiz All</a></li>
-            <li><a href="/Static/views/result.html">Quiz Results</a></li>
-        </ul>
-    </nav>
     <main>
         <section id="create-quiz">
             <h2>Create a New Quiz</h2>
@@ -56,7 +53,6 @@
             </form>
         </section>
     </main>
-    <script src="/static/public/js/nav.js"></script>
     <script src="/static/public/js/admin.js"></script>
     <script src="/Static/public/js/cookie.js"></script>
 </body>
