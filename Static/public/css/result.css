@@ -66,10 +66,7 @@ header h1 {
     align-items: center;
     gap: 10px;
     margin-left: auto;
-}
-
-#logged-in-user {
-    font-size: 0.9em;
+    padding-right: 20px; /* Tilføjer afstand fra højre side */
 }
 
 #logout-button {
@@ -80,9 +77,18 @@ header h1 {
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.8em;
+    font-weight: bold; /* Gør logud-knappen fed */
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-left: 10px;
+    position: relative;
+    right: 10px; /* Rykker knappen lidt mod venstre */
 }
+
+
+#logged-in-user {
+    font-size: 0.9em;
+}
+
 
 #logout-button:hover {
     background-color: #555;

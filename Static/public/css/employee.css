@@ -37,10 +37,7 @@ header h1 {
     align-items: center;
     gap: 10px;
     margin-left: auto;
-}
-
-#logged-in-user {
-    font-size: 0.9em;
+    padding-right: 20px; /* Tilføjer afstand fra højre side */
 }
 
 #logout-button {
@@ -54,6 +51,11 @@ header h1 {
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-left: 10px;
 }
+
+#logged-in-user {
+    font-size: 0.9em;
+}
+
 
 #logout-button:hover {
     background-color: #555;
