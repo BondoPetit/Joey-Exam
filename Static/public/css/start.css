@@ -1,6 +1,6 @@
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #e41919;
+    background-color: #ffffff;
     margin: 0;
     padding: 0;
     color: #333;
@@ -9,6 +9,20 @@ body {
     align-items: center;
     justify-content: center;
     height: 100vh;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 20px; /* For afstand mellem logoet og knapperne */
+}
+
+#corner-logo {
+    max-width: 150px; /* Justér logoets størrelse */
+    height: auto;
 }
 
 
@@ -30,9 +44,13 @@ body {
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    width: 250px; /* Ens bredde */
+    height: 50px; /* Ens højde */
+    text-align: center;
 }
 
 #role-selection button:hover {
     background-color: #e6005c;
 }
+
 
