@@ -6,6 +6,8 @@ const sql = require('mssql');
 const session = require('express-session'); // Import express-session to manage sessions
 const app = express();
 const PORT = 3000;
+const favicon = require('serve-favicon');
+
 
 // Import controllers for application functionalities
 const admin_login = require('./Static/controllers/admin_login');
@@ -29,6 +31,9 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Credentials", "true");
     next();
 });
+
+
+app.use(favicon(path.join(__dirname, 'Static/public/pictures', 'favicon.png')));
 
 // Middleware setup
 app.use(express.urlencoded({ extended: true }));
