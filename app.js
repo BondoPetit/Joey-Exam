@@ -6,8 +6,6 @@ const sql = require('mssql');
 const session = require('express-session'); // Import express-session to manage sessions
 const app = express();
 const PORT = 3000;
-const favicon = require('serve-favicon');
-
 
 // Import controllers for application functionalities
 const admin_login = require('./Static/controllers/admin_login');
@@ -18,6 +16,9 @@ const result_controller = require('./Static/controllers/result_controller');
 const admin_controller = require('./Static/controllers/admin_controller');
 const quiz_all_controller = require('./Static/controllers/quiz_all_controller'); // Import new quiz_all controller
 const { getPool } = require('./database');
+
+// Configure app to trust the first proxy for HTTPS
+app.set('trust proxy', 1);
 
 // Custom middleware to add CORS headers for localhost development and production
 app.use((req, res, next) => {
@@ -32,9 +33,6 @@ app.use((req, res, next) => {
     next();
 });
 
-
-app.use(favicon(path.join(__dirname, 'Static/public/pictures', 'favicon.png')));
-
 // Middleware setup
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -45,10 +43,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // True i produktion (HTTPS), False i udvikling
+        secure: process.env.NODE_ENV === 'production', // True for HTTPS
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'Lax' for localhost, 'None' for cross-origin i produktion
-        maxAge: 1000 * 60 * 60 // 1 time
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 'None' for cross-origin
+        maxAge: 1000 * 60 * 60 // 1 hour
     }
 }));
 
@@ -105,6 +103,27 @@ app.use('/quiz', quiz_all_controller); // Use the new quiz_all controller
 app.post('/admin_login/login', (req, res, next) => {
     console.log('Received POST request to /admin_login/login');
     next();
+});
+
+// Debug sessions on /employee/whoami
+app.get('/employee/whoami', (req, res) => {
+    console.log('Session data on whoami:', req.session);
+    if (req.session && req.session.isEmployee) {
+        res.json({ loggedIn: true, userType: 'employee', email: req.session.email });
+    } else {
+        res.status(401).json({ loggedIn: false });
+    }
+});
+
+// Debug sessions on /employee/get
+app.get('/employee/get', (req, res) => {
+    console.log('Session data on get:', req.session);
+    if (req.session && req.session.isEmployee) {
+        // Fetch quizzes logic
+        res.json(quizzes); // Replace `quizzes` with actual data fetching logic
+    } else {
+        res.status(401).send('Unauthorized');
+    }
 });
 
 // Test database connection on startup
