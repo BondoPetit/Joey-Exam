@@ -1,5 +1,17 @@
 // This script listens for the DOMContentLoaded event, and initializes the admin quiz management functionality.
 document.addEventListener('DOMContentLoaded', async () => {
+    const quizContainer = document.getElementById('create-quiz');
+    const toggleQuizButton = document.getElementById('toggle-quiz-button');
+
+    // Toggle quiz visibility
+    toggleQuizButton.addEventListener('click', () => {
+        quizContainer.classList.toggle('show');
+        toggleQuizButton.textContent = quizContainer.classList.contains('show')
+            ? 'Hide Quiz Creator'
+            : 'Show Quiz Creator';
+    });
+    
+    
     const quizForm = document.getElementById('quiz-form');
     const addQuestionButton = document.getElementById('add-question');
     const questionsContainer = document.getElementById('questions-container');

@@ -99,14 +99,35 @@ header h1 {
     transform: scale(1.05);
 }
 
-/* Main content */
+/* Main container */
 main {
-    padding-top: 80px; /* Giver plads til headeren ovenfor */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: calc(100vh - 60px);
+    display: flex; /* Aktiverer flexbox */
+    justify-content: center; /* Centrerer horisontalt */
+    align-items: center; /* Centrerer vertikalt */
+    min-height: calc(100vh - 60px); /* Fylder hele visningshøjden minus header */
+    padding: 0; /* Ingen ekstra padding */
+    flex-direction: column; /* Sørger for lodret layout */
 }
+
+/* Toggle-knappen */
+#toggle-quiz-button {
+    padding: 10px 20px;
+    background-color: #eeb6d3;
+    color: rgb(5, 5, 5);
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#toggle-quiz-button:hover {
+    background-color: #c290aa;
+    transform: scale(1.05);
+}
+
+
 
 
 /* Body and background */
@@ -120,7 +141,26 @@ body {
     background-attachment: fixed;
     background-position: center;
     color: #333;
+
+    /* Add relative positioning for the pseudo-element */
+    position: relative;
 }
+
+body::after {
+    content: "";
+    position: fixed; /* Ensures it stays in the viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.95) 80%, rgba(0, 0, 0, 1) 100%);
+    z-index: -1; /* Keeps it behind all content */
+    pointer-events: none; /* Prevent interaction */
+}
+
+
+
+
 
 /* Main content */
 main {
@@ -132,19 +172,49 @@ main {
 }
 
 
-/* Center indholdet af den store container */
+
+#quiz-container {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#quiz-container.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* Optional: Add a fade-in effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Centering content inside the quiz creator */
 #create-quiz {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centrér alt horisontalt */
-    justify-content: center; /* Hvis der er behov for vertikal centrering */
+    align-items: center;
+    justify-content: center;
     padding: 30px;
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     max-width: 600px;
-    margin: auto;
-    box-sizing: border-box;
+    margin: 20px auto; /* Centrerer sektionen horisontalt */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#create-quiz.show {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* Gør quiz-titlen centreret */
