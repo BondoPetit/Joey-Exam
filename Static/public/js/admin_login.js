@@ -9,8 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('password').value;
 
             try {
-                console.log('Attempting to send login request with:', { username, password });
-
                 // Send en POST-anmodning til serveren for login
                 const response = await fetch('/admin_login/login', {
                     method: 'POST',

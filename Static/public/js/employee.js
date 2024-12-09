@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     credentials: 'include'
                 });
                 if (response.ok) {
-                    window.location.href = '/static/views/employee_login.html';
+                    window.location.href = '/';
                 } else {
                     alert('Failed to log out. Please try again.');
                 }
