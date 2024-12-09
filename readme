@@ -1,0 +1,3 @@
+HUSK!
+
+Opdater .env filens Node_ENV=production i domæne og NODE_ENV=Development i localhost
