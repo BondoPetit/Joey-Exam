@@ -53,6 +53,10 @@ app.use(session({
 // Serve static files from Static directory
 app.use('/Static', express.static(path.join(__dirname, 'Static')));
 
+// Serve static files from intl-tel-input's build directory
+app.use('/static/intl-tel-input', express.static(path.join(__dirname, 'node_modules/intl-tel-input/build')));
+
+
 // Middleware to check if the user is authenticated
 function isAuthenticated(req, res, next) {
     if (req.session && req.session.isAdmin) {

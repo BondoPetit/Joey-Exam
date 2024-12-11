@@ -41,8 +41,8 @@ header h1 {
 }
 
 #logout-button {
-    background-color: #333;
-    color: white;
+    background-color: #db7ea3; 
+    color: white; 
     border: none;
     padding: 6px 10px;
     border-radius: 4px;
@@ -52,42 +52,45 @@ header h1 {
     margin-left: 10px;
 }
 
+#logout-button:hover {
+    background-color: #E8B0C9; 
+    transform: scale(1.05); 
+}
+
+
 #logged-in-user {
     font-size: 0.9em;
 }
 
 
-#logout-button:hover {
-    background-color: #555;
-    transform: scale(1.05);
-}
-
-/* Body and background */
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-image: url('/static/public/pictures/front.jpg');
+    background: url('/static/public/pictures/front.jpg') no-repeat center center fixed;
     background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
     color: #333;
 
-    /* Add relative positioning for the pseudo-element */
+    /* Ensure stacking context for pseudo-element */
     position: relative;
 }
 
 body::after {
     content: "";
-    position: fixed; /* Ensures it stays in the viewport */
+    position: fixed; /* Stays in the viewport */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.95) 80%, rgba(0, 0, 0, 1) 100%);
-    z-index: -1; /* Keeps it behind all content */
+    background: linear-gradient(to bottom, rgba(50, 50, 50, 0.5), rgba(50, 50, 50, 1));
+    z-index: 0; /* Ensures it stays below content but above body background */
     pointer-events: none; /* Prevent interaction */
+}
+
+/* Optional: Ensure other content is above the gradient */
+main, header {
+    position: relative;
+    z-index: 1;
 }
 
 /* Main-indhold */
@@ -234,5 +237,129 @@ main {
     .back-button,
     .submit-quiz {
         padding: 8px 12px;
+    }
+}
+
+.quiz button {
+    background-color: #db7ea3; /* Pink color */
+    color: white; /* Black text */
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.quiz button:hover {
+    background-color: #E8B0C9; /* Hover color */
+    transform: scale(1.05); /* Slight scaling on hover */
+}
+
+/* General styles */
+.quiz-container {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    margin-bottom: 20px;
+    max-width: 600px;
+    width: 90%;
+    margin: auto;
+    text-align: center;
+}
+
+.quiz-container h3 {
+    font-size: 1.6em;
+    color: #db7ea3; /* Pink highlight color */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Question styles */
+.question {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.question p {
+    margin: 0 0 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Answer radio buttons */
+.question label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1em;
+    font-weight: normal;
+    color: #333;
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.question input[type="radio"] {
+    margin-right: 10px;
+}
+
+.question label:hover {
+    background-color: #f6c1d9; /* Light pink for hover */
+    transform: scale(1.03);
+}
+
+.question input[type="radio"]:checked + label {
+    background-color: #db7ea3; /* Pink when selected */
+    color: white;
+    border-color: #db7ea3;
+}
+
+/* Button container */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Back and submit buttons */
+.back-button,
+.submit-quiz {
+    background-color: #db7ea3;
+    color: black;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.back-button:hover,
+.submit-quiz:hover {
+    background-color: #E8B0C9; /* Lighter pink on hover */
+    transform: scale(1.05);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .quiz-container {
+        padding: 20px;
+        width: 95%;
+    }
+
+    .button-container {
+        flex-direction: column;
+    }
+
+    .back-button,
+    .submit-quiz {
+        width: 100%;
+        margin-bottom: 10px;
     }
 }

@@ -8,18 +8,24 @@
     <link rel="icon" type="image/png" href="/static/public/pictures/favicon.png">
 </head>
 <body>
+    <header>
+        <img id="corner-logo" src="/static/public/pictures/logo.png" alt="Joe & The Juice Logo">
+        <h1>Joe Team</h1>
+    </header>
     <main>
-        <h1>Team Player Login</h1>
-        <form id="employee-login-form">
-            <label for="email">Email:</label>
-            <input type="text" id="email" name="email" required>
-            
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            
-            <button type="submit">Login</button>
-        </form>
-        <p>Don't have an account? <a href="employee_register.html">Register here</a></p>
+        <div class="login-container">
+            <h2>Team Player Login</h2>
+            <form id="employee-login-form">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" required>
+                
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                
+                <button type="submit">Login</button>
+            </form>
+            <p>Don't have an account? <a href="employee_register.html">Register here</a></p>
+        </div>
     </main>
     <script src="/static/public/js/employee_login.js"></script>
     <script src="/Static/public/js/cookie.js"></script>
