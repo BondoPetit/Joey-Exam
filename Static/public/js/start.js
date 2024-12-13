@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     // RTT-pinger måling
     const startTime = Date.now();
-    fetch('http://localhost:3000/ping') // Opdater URL'en, hvis nødvendigt
+    const pingUrl = `${window.location.origin}/ping`; // Dynamisk URL baseret på værtsadresse
+    fetch(pingUrl)
         .then(response => response.text())
         .then(() => {
             const endTime = Date.now();
