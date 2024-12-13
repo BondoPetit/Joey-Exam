@@ -39,8 +39,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Tæller til at holde styr på antallet af pings
+    let pingCount = 0;
+    const maxPings = 4; // Maksimalt antal pings
+
     // Kør pinger-funktionen hvert 5. sekund for at måle RTT og responstid
-    setInterval(measureRTT, 5000);
+    const pingInterval = setInterval(() => {
+        if (pingCount < maxPings) {
+            measureRTT();
+            pingCount++;
+        } else {
+            clearInterval(pingInterval); // Stop intervallet efter 4 pings
+            console.log('Maksimalt antal pings nået. Stopper yderligere pings.');
+        }
+    }, 5000);
 
     // Håndtering af knapper
     const coachButton = document.getElementById('coach-button');
