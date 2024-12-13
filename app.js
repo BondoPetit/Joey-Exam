@@ -130,6 +130,13 @@ app.get('/employee/get', (req, res) => {
     }
 });
 
+// Route to test RTT between client and server
+app.get('/ping', (req, res) => {
+    console.log('Ping request received');
+    res.send('pong'); // Responds immediately
+});
+
+
 // Test database connection on startup
 async function checkDatabaseConnection() {
     try {
