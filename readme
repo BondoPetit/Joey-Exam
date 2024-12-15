@@ -1,3 +1,16 @@
-HUSK!
+Joe & The Juice Employee Portal
+Computernetværk og Distribuerede Systemer Eksamensprojekt
 
-Opdater .env filens Node_ENV=production i domæne og NODE_ENV=Development i localhost
+Designet til at være en uddannelsesside til Joe & The Juice medarbejdere
+- Har secure login til medarbejdere og admins
+- Har en database der gemmer medarbejdere, quizzer, samt resultater og statistikker
+
+Lavet med Node.js, Express, Bcrypt, MSSQL...
+
+
+Vigtig information:
+
+For local-development, skifte Node_ENV=production til NODE_ENV=Development i .env filen. 
+HUSK at skifte tilbage til production før server deployment.
+
+Husk også at køre npm install for at installere alle nødvendige pakker, til første brug. 

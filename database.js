@@ -1,4 +1,4 @@
-require('dotenv').config({ path: 'DB.env' }); // Sørg for at denne står øverst!
+require('dotenv').config({ path: 'DB.env' }); 
 const sql = require('mssql');
 
 const config = {
@@ -7,7 +7,7 @@ const config = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     options: {
-        encrypt: process.env.DB_ENCRYPT === 'true' // Husk at sammenligne som streng
+        encrypt: process.env.DB_ENCRYPT === 'true' 
     }
 };
 
@@ -20,7 +20,7 @@ async function getPool() {
     return pool;
 }
 
-console.log('DB_SERVER:', process.env.DB_SERVER); // Debugging: Se hvad der sker
+console.log('DB_SERVER:', process.env.DB_SERVER); // Debugging
 
 module.exports = {
     getPool,

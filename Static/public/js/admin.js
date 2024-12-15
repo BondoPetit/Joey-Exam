@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (response.ok) {
             const result = await response.json();
             if (result.loggedIn && result.userType === 'admin') {
-                // Viser brugernavnen 
+                // Viser brugernavnet
                 loggedInUserSpan.textContent = `Logged in as: ${result.username}`;
                 logoutButton.style.display = 'block';
             } else {

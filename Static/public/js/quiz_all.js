@@ -1,40 +1,38 @@
-// quiz_all.js
-
 document.addEventListener('DOMContentLoaded', async () => {
     const quizzesContainer = document.getElementById('quizzes-container');
     const loggedInUserSpan = document.getElementById('logged-in-user');
     const logoutButton = document.getElementById('logout-button');
 
-    // Check who is logged in
+    // Tjekker hvem er logget ind
     try {
         const response = await fetch('/admin/whoami');
         if (response.ok) {
             const result = await response.json();
             if (result.loggedIn && result.userType === 'admin') {
-                // Show the logged in username
+                // Viser brugernavnet for den der er logget ind
                 loggedInUserSpan.textContent = `Logged in as: ${result.username}`;
                 logoutButton.style.display = 'block';
             } else {
                 alert('You are not authorized to view this page. Please log in as an admin.');
-                // Redirect to login page
+                // Redirecter til loginsiden
                 window.location.href = `${window.location.origin}/static/views/admin_login.html`;
-                return; // Stop further script execution
+                return; 
             }
         } else {
             alert('Unable to verify login status. Please log in.');
-            // Redirect to login page
+            // Redirecter til loginsiden
             window.location.href = `${window.location.origin}/static/views/admin_login.html`;
-            return; // Stop further script execution
+            return; 
         }
     } catch (error) {
         console.error('Error checking login status:', error);
         alert('An error occurred while checking login status. Please log in.');
-        // Redirect to login page
+        // Redirecter til loginsiden
         window.location.href = `${window.location.origin}/static/views/admin_login.html`;
-        return; // Stop further script execution
+        return; 
     }
 
-    // Handle logout button click
+    // Logout-knap
     logoutButton.addEventListener('click', async () => {
         try {
             const response = await fetch('/admin/logout', {
@@ -44,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             if (response.ok) {
-                // Redirect to the homepage after successful logout
+                // Sender brugeren tilbage til forsiden
                 window.location.href = `${window.location.origin}/`;
             } else {
                 alert('Failed to log out. Please try again.');
@@ -55,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Fetch all quizzes from the server
+    // Henter quizzerne
     try {
         const response = await fetch('/quiz/all');
         if (response.ok) {
@@ -70,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 quizzesContainer.appendChild(quizDiv);
             });
 
-            // Add event listeners to delete buttons
+            // Eventlisteners til slet-knapperne
             document.querySelectorAll('.delete-quiz').forEach(button => {
                 button.addEventListener('click', async (event) => {
                     const quizId = event.target.getAttribute('data-quiz-id');
@@ -84,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             });
                             if (response.ok) {
                                 alert('Quiz deleted successfully.');
-                                // Reload the page to update the quiz list
+                                // Reloader siden for at opdatere listen
                                 window.location.reload();
                             } else {
                                 alert('Failed to delete quiz. Please try again.');

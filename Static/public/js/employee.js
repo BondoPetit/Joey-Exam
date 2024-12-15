@@ -37,26 +37,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loggedInUserSpan.textContent = `Logged in as: ${result.email}`;
             } else {
                 alert('You are not authorized to view this page. Please log in as an employee.');
-                // Redirect to login page
+                // Sender brugeren til loginsiden
                 window.location.href = `${window.location.origin}/static/views/employee_login.html`;
-                return; // Stop further script execution
+                return; 
             }
         } else {
             alert('Unable to verify login status. Please log in.');
-            // Redirect to login page
+            // Sender brugeren til loginsiden
             window.location.href = `${window.location.origin}/static/views/employee_login.html`;
-            return; // Stop further script execution
+            return; 
         }
     } catch (error) {
         console.error('Error checking login status:', error);
         alert('An error occurred while checking login status. Please log in.');
-        // Redirect to login page
+        // Sender brugeren til loginsiden
         window.location.href = `${window.location.origin}/static/views/employee_login.html`;
-        return; // Stop further script execution
+        return; 
     }
 
     try {
-        // Fetch quizzes from the server
+        // Henter quizzerne fra serveren
         const response = await fetch('/employee/get', { credentials: 'include' });
         if (!response.ok) {
             throw new Error('Failed to fetch quizzes from the server');
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         quizList.innerHTML = '<p>Error fetching quizzes. Please try again later.</p>';
     }
 
-    // Function to handle quiz taking
+    // Funktion til at tage en quiz
     window.startQuiz = async function (quizID) {
         try {
             const response = await fetch(`/employee/get/${quizID}`, { credentials: 'include' });
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 quizContainer.appendChild(questionDiv);
             });
 
-            // Create button container and buttons
+            // Laver containers til knapperne, og knapperne
             const buttonContainer = document.createElement('div');
             buttonContainer.classList.add('button-container');
 
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             submitButton.textContent = 'Submit Quiz';
             submitButton.classList.add('submit-quiz');
             submitButton.onclick = async () => {
-                // Gather results from the quiz
+                // Henter resultater fra quizzen
                 const employeeAnswers = [];
                 quiz.questions.forEach((question, qIndex) => {
                     const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
@@ -133,22 +133,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                 });
 
-                // Retrieve employeeId from session storage
+                // Tager employeeid fra session data
                 const employeeId = sessionStorage.getItem('employeeId');
                 if (!employeeId) {
                     alert('No employee ID found. Please log in again.');
                     return;
                 }
 
-                // Create result object
+                // Laver resultat objekt
                 const result = {
-                    quizID: quiz.quizID, // Include quizID here
+                    quizID: quiz.quizID, 
                     title: quiz.title,
                     employeeId: employeeId,
                     questions: employeeAnswers
                 };
 
-                // Send the result to the server to save in the database
+                // Sender resultatet til serveren for at gemme den
                 try {
                     const response = await fetch('/employee/submit', {
                         credentials: 'include',
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
 
                     if (response.ok) {
-                        // Show feedback after submission
+                        // Viser feedback til brugeren
                         quiz.questions.forEach((question, qIndex) => {
                             const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
                             const questionDiv = document.querySelectorAll('.question')[qIndex];
@@ -191,7 +191,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             buttonContainer.appendChild(submitButton);
 
-            // Append button container after questions
             quizContainer.appendChild(buttonContainer);
 
             quizList.innerHTML = '';
@@ -202,7 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Function to reload available quizzes
+    // Reloader quizzerne
     function loadAvailableQuizzes() {
         quizList.innerHTML = '';
         quizzes.forEach((quiz) => {
@@ -210,15 +209,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             quizDiv.classList.add('quiz');
             quizDiv.style.position = 'relative';
 
-            // Add status icon to indicate if the quiz is completed
+            // Status ikon til at vise om quizzen er taget eller ej
             const statusIcon = document.createElement('div');
             statusIcon.classList.add('status-icon');
             if (quiz.completed) {
-                statusIcon.innerHTML = '&#x2714;'; // Green checkmark symbol
+                statusIcon.innerHTML = '&#x2714;'; // Green checkmark 
                 statusIcon.style.backgroundColor = 'green';
                 statusIcon.style.color = 'white';
             } else {
-                statusIcon.innerHTML = '&#x25CB;'; // Circle symbol
+                statusIcon.innerHTML = '&#x25CB;'; // Cirkel symbol
                 statusIcon.style.color = 'grey';
             }
             statusIcon.style.position = 'absolute';
