@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const logoutButton = document.getElementById('logout-button');
+    const viewHistoryButton = document.getElementById('view-history-button');
+    const historySection = document.getElementById('history-section');
+    const historyList = document.getElementById('history-list');
     if (logoutButton) {
         logoutButton.style.display = 'block'; 
         logoutButton.addEventListener('click', async () => {
@@ -122,7 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             submitButton.textContent = 'Submit Quiz';
             submitButton.classList.add('submit-quiz');
             submitButton.onclick = async () => {
-                // Henter resultater fra quizzen
+                // Fjerner gammel feedback (Hvis det eksisterer)
+                const oldFeedbacks = quizContainer.querySelectorAll('.feedback');
+                oldFeedbacks.forEach(feedback => feedback.remove());
+                
+                
                 const employeeAnswers = [];
                 quiz.questions.forEach((question, qIndex) => {
                     const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
@@ -132,23 +139,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                         correctAnswer: question.answers.find(answer => answer.isCorrect).text
                     });
                 });
-
-                // Tager employeeid fra session data
+            
                 const employeeId = sessionStorage.getItem('employeeId');
                 if (!employeeId) {
                     alert('No employee ID found. Please log in again.');
                     return;
                 }
-
-                // Laver resultat objekt
+            
                 const result = {
                     quizID: quiz.quizID, 
                     title: quiz.title,
                     employeeId: employeeId,
                     questions: employeeAnswers
                 };
-
-                // Sender resultatet til serveren for at gemme den
+            
                 try {
                     const response = await fetch('/employee/submit', {
                         credentials: 'include',
@@ -158,15 +162,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                         },
                         body: JSON.stringify(result)
                     });
-
+            
                     if (response.ok) {
-                        // Viser feedback til brugeren
+                        // Vise ny feedback
                         quiz.questions.forEach((question, qIndex) => {
                             const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
                             const questionDiv = document.querySelectorAll('.question')[qIndex];
                             const feedbackDiv = document.createElement('div');
                             feedbackDiv.classList.add('feedback');
-
+            
                             if (selectedAnswer && selectedAnswer.value === question.answers.find(answer => answer.isCorrect).text) {
                                 feedbackDiv.classList.add('correct');
                                 feedbackDiv.innerText = 'Correct!';
@@ -174,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 feedbackDiv.classList.add('incorrect');
                                 feedbackDiv.innerText = 'Incorrect!';
                             }
-
+            
                             questionDiv.appendChild(feedbackDiv);
                         });
                         alert('Quiz submitted successfully!');
@@ -188,6 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     alert('An error occurred while submitting the quiz.');
                 }
             };
+            
 
             buttonContainer.appendChild(submitButton);
 
@@ -238,4 +243,65 @@ document.addEventListener('DOMContentLoaded', async () => {
             quizList.appendChild(quizDiv);
         });
     }
+    viewHistoryButton.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/employee/history', { credentials: 'include' });
+            if (!response.ok) {
+                if (response.status === 401) {
+                    alert('You must be logged in as an employee to view your quiz history.');
+                    return;
+                }
+                throw new Error('Error fetching quiz history from the server');
+            }
+
+            const quizHistory = await response.json();
+
+            // Fjerner historik
+            historyList.innerHTML = '';
+
+            if (!Array.isArray(quizHistory) || quizHistory.length === 0) {
+                historyList.innerHTML = '<p>You have no quiz history yet.</p>';
+            } else {
+                quizHistory.forEach((quiz) => {
+                    const quizDiv = document.createElement('div');
+                    quizDiv.classList.add('quiz-history-result');
+                    quizDiv.innerHTML = `
+                        <h3>Quiz: ${quiz.title}</h3>
+                        <button class="toggle-employee-history-button">Show My Answers</button>
+                        <div class="employee-quiz-results hidden"></div>
+                    `;
+
+                    const resultsContainer = quizDiv.querySelector('.employee-quiz-results');
+                    
+                    quiz.employeeSummaries.forEach((result) => {
+                        
+                        const resultDiv = document.createElement('div');
+                        resultDiv.classList.add('employee-summary');
+                        resultDiv.innerHTML = `
+                            <p><strong>Your Employee ID:</strong> ${result.employeeId}</p>
+                            <p><strong>Incorrect Answers Count:</strong> ${result.incorrectCount}</p>
+                        `;
+                        resultsContainer.appendChild(resultDiv);
+                    });
+
+                    const toggleButton = quizDiv.querySelector('.toggle-employee-history-button');
+                    toggleButton.addEventListener('click', () => {
+                        resultsContainer.classList.toggle('hidden');
+                        toggleButton.textContent = resultsContainer.classList.contains('hidden') 
+                            ? 'Show My Answers' 
+                            : 'Hide My Answers';
+                    });
+
+                    historyList.appendChild(quizDiv);
+                });
+            }
+
+            // Vise historik
+            historySection.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error fetching quiz history:', error);
+            historyList.innerHTML = '<p>Error fetching quiz history. Please try again later.</p>';
+            historySection.classList.remove('hidden');
+        }
+    });
 });

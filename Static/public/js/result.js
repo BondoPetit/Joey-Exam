@@ -88,10 +88,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const resultDiv = document.createElement('div');
                 resultDiv.classList.add('employee-summary');
                 resultDiv.innerHTML = `
-                    <p><strong>Submitted by Employee ID:</strong> ${result.employeeId}</p>
+                    <p><strong>Submitted by:</strong> ${result.employeeEmail}</p>
                     <p><strong>Incorrect Answers Count:</strong> ${result.incorrectCount}</p>
                 `;
-
+            
                 resultsContainer.appendChild(resultDiv);
             });
 

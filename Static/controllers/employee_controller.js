@@ -219,4 +219,78 @@ router.get('/whoami', isAuthenticated, (req, res) => {
     }
 });
 
+// Kode for at vise quiz historik
+router.get('/history', isAuthenticated, async (req, res) => {
+    const employeeId = req.session.employeeId; 
+    try {
+        const pool = await getPool();
+
+        const resultsQuery = await pool.request()
+            .input('employeeId', sql.Int, employeeId) 
+            .query(`
+            SELECT r.ResultID, r.Title, r.EmployeeID, ea.QuestionText, ea.EmployeeAnswer, ea.CorrectAnswer
+            FROM EmployeeResults r
+            LEFT JOIN EmployeeAnswers ea ON r.ResultID = ea.ResultID
+            WHERE r.EmployeeID = @employeeId
+            ORDER BY r.Title, r.ResultID
+    `       );
+
+        const rawResults = resultsQuery.recordset;
+        if (rawResults.length === 0) {
+            // Hvis der ikke er nogen resultater, returneres en tom liste
+            return res.status(200).json([]);
+        }
+
+        // Formatterer resultaterne
+        const formattedResults = {};
+        rawResults.forEach(row => {
+            if (!formattedResults[row.Title]) {
+                formattedResults[row.Title] = {
+                    title: row.Title,
+                    results: [],
+                };
+            }
+
+            let currentQuiz = formattedResults[row.Title];
+            let existingResult = currentQuiz.results.find(result => result.employeeId === row.EmployeeID);
+
+            if (!existingResult) {
+                existingResult = {
+                    employeeId: row.EmployeeID,
+                    questions: [],
+                    incorrectCount: 0,
+                };
+                currentQuiz.results.push(existingResult);
+            }
+
+            const isCorrect = row.EmployeeAnswer === row.CorrectAnswer;
+            existingResult.questions.push({
+                text: row.QuestionText,
+                employeeAnswer: row.EmployeeAnswer,
+                correctAnswer: row.CorrectAnswer,
+                isCorrect
+            });
+            if (!isCorrect) {
+                existingResult.incorrectCount++;
+            }
+        });
+
+        // Laver results ind til en array
+        const results = Object.values(formattedResults).map(quiz => {
+            return {
+                title: quiz.title,
+                employeeSummaries: quiz.results.map(result => ({
+                    employeeId: result.employeeId,
+                    incorrectCount: result.incorrectCount
+                }))
+            };
+        });
+
+        res.status(200).json(results);
+    } catch (err) {
+        console.error('Error fetching employee quiz history:', err.message);
+        res.status(500).json({ error: 'An error occurred while fetching your quiz history.' });
+    }
+});
+
 module.exports = router;
