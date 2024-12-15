@@ -1,5 +1,4 @@
-// Import the required modules
-require('dotenv').config(); // This should be at the top to load .env file
+require('dotenv').config(); 
 const express = require('express');
 const sql = require('mssql');
 const bcrypt = require('bcrypt');
@@ -7,25 +6,25 @@ const router = express.Router();
 const { getPool } = require('../../database');
 const twilio = require('twilio');
 
-// Twilio credentials
-const accountSid = process.env.TWILIO_ACCOUNT_SID; // Primary Account SID
-const apiKeySid = process.env.TWILIO_API_KEY_SID; // API Key SID
+// Twilio API data
+const accountSid = process.env.TWILIO_ACCOUNT_SID; 
+const apiKeySid = process.env.TWILIO_API_KEY_SID; // API Key
 const apiKeySecret = process.env.TWILIO_API_KEY_SECRET; // API Key Secret
 
-// Initialize Twilio client with API Key
+// Bruger API nøgle til at oprette Twilio klient
 const client = twilio(apiKeySid, apiKeySecret, { accountSid });
 
-// Route for sending SMS verification code
+// Funktion for at sende verifikations kode
 router.post('/send-verification-code', async (req, res) => {
     const { phoneNumber } = req.body;
     if (!phoneNumber) {
         return res.status(400).json({ error: 'Phone number is required.' });
     }
     try {
-        const verificationCode = Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit code
+        const verificationCode = Math.floor(100000 + Math.random() * 900000); // Laver en 6-cifret kode
         await client.messages.create({
             body: `Your verification code is: ${verificationCode}`,
-            from: process.env.TWILIO_PHONE_NUMBER, // Twilio phone number
+            from: process.env.TWILIO_PHONE_NUMBER, 
             to: phoneNumber
         });
 
@@ -43,7 +42,7 @@ router.post('/send-verification-code', async (req, res) => {
     }
 });
 
-// Route for handling phone number verification
+// Håndterer tlf verificering
 router.post('/verify-code', async (req, res) => {
     const { phoneNumber, verificationCode } = req.body;
     if (!phoneNumber || !verificationCode) {
@@ -51,7 +50,7 @@ router.post('/verify-code', async (req, res) => {
     }
     try {
         if (req.session.verificationCode && req.session.verificationCode === parseInt(verificationCode, 10)) {
-            delete req.session.verificationCode; // Clear verification code after successful verification
+            delete req.session.verificationCode; // Fjerner koden efter verificering
             req.session.save((err) => {
                 if (err) {
                     console.error('Error clearing verification code from session:', err);
@@ -68,7 +67,7 @@ router.post('/verify-code', async (req, res) => {
     }
 });
 
-// Route for employee registration
+// Route til registrering af bruger
 router.post('/register', async (req, res) => {
     const { email, password, phoneNumber } = req.body;
     if (!email || !password || !phoneNumber) {
@@ -109,7 +108,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Route for employee login
+// Route til login af bruger
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {

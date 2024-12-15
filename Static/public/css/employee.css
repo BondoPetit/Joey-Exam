@@ -5,7 +5,6 @@ html, body {
     color: #333;
 }
 
-/* Header */
 header {
     background-color: white;
     height: 60px;
@@ -16,10 +15,9 @@ header {
     z-index: 1000;
     font-size: 1.1em;
     gap: 20px;
-    font-weight: bold; /* Gør al tekst i headeren fed */
+    font-weight: bold; 
 }
 
-/* Logo inde i headeren uden fixed position */
 #corner-logo {
     width: 40px;
     height: auto;
@@ -31,13 +29,13 @@ header h1 {
     font-size: 1.2em;
 }
 
-/* User info og logout-knap */
+
 #user-info {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-left: auto;
-    padding-right: 20px; /* Tilføjer afstand fra højre side */
+    padding-right: 20px; 
 }
 
 #logout-button {
@@ -71,37 +69,37 @@ body {
     background-size: cover;
     color: #333;
 
-    /* Ensure stacking context for pseudo-element */
+    
     position: relative;
 }
 
 body::after {
     content: "";
-    position: fixed; /* Stays in the viewport */
+    position: fixed; 
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background: linear-gradient(to bottom, rgba(50, 50, 50, 0.5), rgba(50, 50, 50, 1));
-    z-index: 0; /* Ensures it stays below content but above body background */
-    pointer-events: none; /* Prevent interaction */
+    z-index: 0; 
+    pointer-events: none; 
 }
 
-/* Optional: Ensure other content is above the gradient */
+
 main, header {
     position: relative;
     z-index: 1;
 }
 
-/* Main-indhold */
+
 main {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 60px 20px; /* Giver lidt luft under headeren */
+    padding: 60px 20px; 
 }
 
-/* Available Quizzes section */
+
 #available-quizzes {
     background-color: rgba(255, 255, 255, 0.9);
     padding: 30px;
@@ -119,7 +117,6 @@ main {
     text-align: center;
 }
 
-/* Quiz listelementer */
 .quiz {
     background-color: #f9f9f9;
     padding: 15px;
@@ -134,7 +131,6 @@ main {
     gap: 20px;
 }
 
-/* Eksempel på quiz-elementer – tilpas efter behov */
 .quiz-item {
     background-color: #f9f9f9;
     padding: 15px;
@@ -152,7 +148,6 @@ main {
     margin: 5px 0;
 }
 
-/* Skjul elementer hvis behov */
 .hidden {
     display: none;
 }
@@ -227,7 +222,6 @@ main {
     color: red;
 }
 
-/* Responsive tilpasning */
 @media (max-width: 768px) {
     .quiz-container {
         padding: 20px;
@@ -241,8 +235,8 @@ main {
 }
 
 .quiz button {
-    background-color: #db7ea3; /* Pink color */
-    color: white; /* Black text */
+    background-color: #db7ea3; 
+    color: white; 
     border: none;
     padding: 6px 10px;
     border-radius: 4px;
@@ -252,11 +246,10 @@ main {
 }
 
 .quiz button:hover {
-    background-color: #E8B0C9; /* Hover color */
-    transform: scale(1.05); /* Slight scaling on hover */
+    background-color: #E8B0C9; 
+    transform: scale(1.05); 
 }
 
-/* General styles */
 .quiz-container {
     background-color: rgba(255, 255, 255, 0.95);
     padding: 30px;
@@ -271,12 +264,11 @@ main {
 
 .quiz-container h3 {
     font-size: 1.6em;
-    color: #db7ea3; /* Pink highlight color */
+    color: #db7ea3; 
     margin-bottom: 20px;
     text-align: center;
 }
 
-/* Question styles */
 .question {
     margin-bottom: 20px;
     text-align: left;
@@ -288,7 +280,6 @@ main {
     color: #333;
 }
 
-/* Answer radio buttons */
 .question label {
     display: block;
     margin-bottom: 10px;
@@ -308,17 +299,16 @@ main {
 }
 
 .question label:hover {
-    background-color: #f6c1d9; /* Light pink for hover */
+    background-color: #f6c1d9; 
     transform: scale(1.03);
 }
 
 .question input[type="radio"]:checked + label {
-    background-color: #db7ea3; /* Pink when selected */
+    background-color: #db7ea3; 
     color: white;
     border-color: #db7ea3;
 }
 
-/* Button container */
 .button-container {
     display: flex;
     justify-content: space-between;
@@ -326,7 +316,6 @@ main {
     margin-top: 20px;
 }
 
-/* Back and submit buttons */
 .back-button,
 .submit-quiz {
     background-color: #db7ea3;
@@ -342,11 +331,11 @@ main {
 
 .back-button:hover,
 .submit-quiz:hover {
-    background-color: #E8B0C9; /* Lighter pink on hover */
+    background-color: #E8B0C9; 
     transform: scale(1.05);
 }
 
-/* Mobile responsiveness */
+/* Mobilt tilgængelighed */
 @media (max-width: 768px) {
     .quiz-container {
         padding: 20px;

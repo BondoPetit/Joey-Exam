@@ -1,11 +1,9 @@
-// New result controller file: result_controller.js
-
 const express = require('express');
 const sql = require('mssql');
 const router = express.Router();
 const { getPool } = require('../../database');
 
-// Middleware to check if the user is authenticated
+// Tjekker hvis brugeren er authentificeret
 function isAuthenticated(req, res, next) {
     if (req.session && req.session.isAdmin) {
         return next();
@@ -14,7 +12,7 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-// Route for fetching all quiz results and statistics
+// Route til at fetche quizresultater og statistikker
 router.get('/', isAuthenticated, async (req, res) => {  // Middleware applied here
     try {
         const pool = await getPool();
@@ -28,7 +26,7 @@ router.get('/', isAuthenticated, async (req, res) => {  // Middleware applied he
         const rawResults = resultsQuery.recordset;
         const formattedResults = {};
 
-        // Group results by Quiz Title
+        // Grupperer resultater efter quizzer
         rawResults.forEach(row => {
             if (!formattedResults[row.Title]) {
                 formattedResults[row.Title] = {
@@ -49,7 +47,7 @@ router.get('/', isAuthenticated, async (req, res) => {  // Middleware applied he
                 currentQuiz.results.push(existingResult);
             }
 
-            // Push question details
+            // Pusher spørgsmål detaljer
             const isCorrect = row.EmployeeAnswer === row.CorrectAnswer;
             existingResult.questions.push({
                 text: row.QuestionText,
@@ -62,7 +60,7 @@ router.get('/', isAuthenticated, async (req, res) => {  // Middleware applied he
             }
         });
 
-        // Flatten results into an array for each quiz
+        // Sætter resultaterne i en array for hvert quiz
         const results = Object.values(formattedResults).map(quiz => {
             return {
                 title: quiz.title,
@@ -82,8 +80,8 @@ router.get('/', isAuthenticated, async (req, res) => {  // Middleware applied he
     }
 });
 
-// Route for fetching detailed quiz results for a specific quiz and employee
-router.get('/:quizTitle/:employeeId', isAuthenticated, async (req, res) => {  // Middleware applied here
+// Henter specifikke resultater for et bestemt quiz og medarbejder
+router.get('/:quizTitle/:employeeId', isAuthenticated, async (req, res) => {  
     const { quizTitle, employeeId } = req.params;
     try {
         const pool = await getPool();

@@ -1,9 +1,8 @@
-// This script listens for the DOMContentLoaded event, and initializes the admin quiz management functionality.
 document.addEventListener('DOMContentLoaded', async () => {
     const quizContainer = document.getElementById('create-quiz');
     const toggleQuizButton = document.getElementById('toggle-quiz-button');
 
-    // Toggle quiz visibility
+    // Toggler at quizzen bliver vist
     toggleQuizButton.addEventListener('click', () => {
         quizContainer.classList.toggle('show');
         toggleQuizButton.textContent = quizContainer.classList.contains('show')
@@ -19,26 +18,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     const logoutButton = document.getElementById('logout-button');
     let questionCount = 1;
 
-    // Check who is logged in
+    // Tjekker hvem er logget ind
     try {
         const response = await fetch('/admin/whoami');
         if (response.ok) {
             const result = await response.json();
             if (result.loggedIn && result.userType === 'admin') {
-                // Show the logged in username
+                // Viser brugernavnen 
                 loggedInUserSpan.textContent = `Logged in as: ${result.username}`;
                 logoutButton.style.display = 'block';
             } else {
                 alert('You are not authorized to view this page. Please log in as an admin.');
-                // Redirect to login page
+                // Redirecter til loginsiden
                 window.location.href = `${window.location.origin}/static/views/admin_login.html`;
-                return; // Stop further script execution
+                return; 
             }
         } else {
             alert('Unable to verify login status. Please log in.');
-            // Redirect to login page
+            // Redirecter til loginsiden
             window.location.href = `${window.location.origin}/static/views/admin_login.html`;
-            return; // Stop further script execution
+            return; 
         }
     } catch (error) {
         console.error('Error checking login status:', error);
@@ -48,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return; // Stop further script execution
     }
 
-    // Handle logout button click
+    // Logout funktion
     logoutButton.addEventListener('click', async () => {
         try {
             const response = await fetch('/admin/logout', {
@@ -58,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             if (response.ok) {
-                // Redirect to the homepage after successful logout
+                // Sender brugeren til loginsiden
                 window.location.href = `${window.location.origin}/`;
             } else {
                 alert('Failed to log out. Please try again.');
@@ -121,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         console.log(quizData);
         
-        // Send quiz data to the backend to save in the database
+        // Sender quiz data til serveren til at gemme i databasen
         try {
             const response = await fetch('/quiz/save', {
                 method: 'POST',
@@ -135,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const result = await response.json();
                 console.log('Quiz saved to database:', result.message);
                 alert('Quiz saved successfully.');
-                // Reset the form fields after successful save
+                // Resetter form inputsne
                 quizForm.reset();
                 questionsContainer.innerHTML = '';
                 questionCount = 1;

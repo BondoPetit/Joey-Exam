@@ -1,17 +1,15 @@
-// cookie.js - Script for handling cookies in the application.
-//Is not currently being used reqally
 
-// Set a cookie with specified name, value, and expiration days
+// Laver en cookie med en specifik navn, værdi, og expiration
 function setCookie(name, value, days) {
     const d = new Date();
     d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
     const expires = "expires=" + d.toUTCString();
     const secure = location.protocol === 'https:' ? ';secure' : '';
-    const sameSite = ';samesite=Strict'; // Ensures the cookie is sent in a first-party context only
+    const sameSite = ';samesite=Strict'; // Bruger kun cookie'en på den samme webside
     document.cookie = `${name}=${value};${expires};path=/${secure}${sameSite}`;
 }
 
-// Get a cookie by name
+// Henter en cookie ved at bruge navnet
 function getCookie(name) {
     const cname = name + "=";
     const decodedCookie = decodeURIComponent(document.cookie);
@@ -25,24 +23,23 @@ function getCookie(name) {
     return "";
 }
 
-// Delete a cookie by name
+// Sletter et bestemt cookie
 function deleteCookie(name) {
     setCookie(name, "", -1);
 }
 
-// Example usage for login tracking or user preferences
+// Kan bruges til at gemme bruger layout præferencer
 function rememberUserPreference(theme) {
-    setCookie("userTheme", theme, 30); // Save theme preference for 30 days
+    setCookie("userTheme", theme, 30); // Gemmer præferencer i 30 dage
 }
 
 function loadUserPreference() {
     const theme = getCookie("userTheme");
     if (theme) {
-        document.body.className = theme; // Apply the saved theme
+        document.body.className = theme; // Sæt den valgte tema
     }
 }
 
-// Export functions for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { setCookie, getCookie, deleteCookie, rememberUserPreference, loadUserPreference };
 }

@@ -1,9 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,500;8..144,600;8..144,700&family=Roboto+Condensed:wght@700&display=swap');
+
 html, body {
     margin: 0;
     padding: 0;
 }
 
-/* Gør al tekst i headeren fed */
 header {
     background-color: white;
     height: 60px;
@@ -14,24 +15,21 @@ header {
     z-index: 1000;
     font-size: 1.1em;
     gap: 20px;
-    font-weight: bold; /* Gør al tekst i headeren fed */
+    font-weight: bold; 
 }
 
-/* Logo inde i headeren uden absolut positionering */
 #corner-logo {
     width: 40px;
     height: auto;
-    margin-left: 20px; /* Eventuelt for at få luft til venstre */
+    margin-left: 20px; 
 }
 
-/* H1, navigation og brugerinfo */
 header h1 {
     font-size: 1.2em;
     color: #333;
-    margin: 0; /* Fjern top-margen */
+    margin: 0; 
 }
 
-/* Navigation links */
 #nav-links {
     display: flex;
     align-items: center;
@@ -54,7 +52,7 @@ header h1 {
     text-decoration: none;
     color: #333;
     font-size: 0.9em;
-    font-weight: bold; /* Gør navigationsteksten fed */
+    font-weight: bold; 
     transition: color 0.3s ease;
 }
 
@@ -62,13 +60,12 @@ header h1 {
     color: #555;
 }
 
-/* User info og logout */
 #user-info {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-left: auto;
-    padding-right: 20px; /* Tilføjer afstand fra højre side */
+    padding-right: 20px; 
 }
 
 #logout-button {
@@ -79,18 +76,18 @@ header h1 {
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.8em;
-    font-weight: bold; /* Gør logud-knappen fed */
+    font-weight: bold; 
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-left: 10px;
     position: relative;
-    right: 10px; /* Rykker knappen lidt mod venstre */
+    right: 10px; 
 }
 
 
 #logged-in-user {
     font-size: 0.9em;
     color: #333;
-    font-weight: bold; /* Gør "logged in as" fed */
+    font-weight: bold; 
 }
 
 
@@ -99,17 +96,17 @@ header h1 {
     transform: scale(1.05);
 }
 
-/* Main container */
+
 main {
-    display: flex; /* Aktiverer flexbox */
-    justify-content: center; /* Centrerer horisontalt */
-    align-items: center; /* Centrerer vertikalt */
-    min-height: calc(100vh - 60px); /* Fylder hele visningshøjden minus header */
-    padding: 0; /* Ingen ekstra padding */
-    flex-direction: column; /* Sørger for lodret layout */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: calc(100vh - 60px); 
+    padding: 0; 
+    flex-direction: column; 
 }
 
-/* Toggle-knappen */
+
 #toggle-quiz-button {
     padding: 10px 20px;
     background-color: #eeb6d3;
@@ -129,10 +126,8 @@ main {
 
 
 
-
-/* Body and background */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto Flex', Arial, sans-serif; 
     margin: 0;
     padding: 0;
     background-image: url('/static/public/pictures/front.jpg');
@@ -142,29 +137,25 @@ body {
     background-position: center;
     color: #333;
 
-    /* Add relative positioning for the pseudo-element */
+    
     position: relative;
 }
 
 body::after {
     content: "";
-    position: fixed; /* Ensures it stays in the viewport */
+    position: fixed; 
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.95) 80%, rgba(0, 0, 0, 1) 100%);
-    z-index: -1; /* Keeps it behind all content */
-    pointer-events: none; /* Prevent interaction */
+    z-index: -1; 
+    pointer-events: none; 
 }
 
 
-
-
-
-/* Main content */
 main {
-    padding-top: 80px; /* Giver plads til den faste header */
+    padding-top: 80px; 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -185,7 +176,7 @@ main {
 }
 
 
-/* Optional: Add a fade-in effect */
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -195,7 +186,6 @@ main {
     }
 }
 
-/* Centering content inside the quiz creator */
 #create-quiz {
     display: flex;
     flex-direction: column;
@@ -206,7 +196,7 @@ main {
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     max-width: 600px;
-    margin: 20px auto; /* Centrerer sektionen horisontalt */
+    margin: 20px auto; 
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -217,14 +207,13 @@ main {
     visibility: visible;
 }
 
-/* Gør quiz-titlen centreret */
 #create-quiz label[for="quiz-title"],
 #create-quiz #quiz-title {
     display: block;
-    width: 100%; /* Brug hele containerens bredde */
-    max-width: 500px; /* Begræns bredden, så det ser godt ud */
-    margin: 0 auto; /* Centrér feltet horisontalt */
-    text-align: center; /* Sørg for labelens tekst er centreret */
+    width: 100%; 
+    max-width: 500px; 
+    margin: 0 auto; 
+    text-align: center; 
 }
 
 #create-quiz #quiz-title {
@@ -236,9 +225,6 @@ main {
 }
 
 
-
-
-/* Inputs and buttons */
 form#quiz-form input[type="text"],
 form#quiz-form input[type="number"] {
     padding: 10px;
@@ -270,38 +256,38 @@ form#quiz-form button:hover {
 #questions-container {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Afstand mellem spørgsmål */
-    overflow: hidden; /* Forhindrer elementer i at gå udenfor containeren */
+    gap: 20px; 
+    overflow: hidden; 
 }
 
 .question-separator {
-    margin-top: 20px; /* Afstand mellem spørgsmål */
+    margin-top: 20px; 
     padding: 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #f9f9f9;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    max-width: 100%; /* Sørg for, at hvert spørgsmål ikke overskrider containerens bredde */
-    box-sizing: border-box; /* Medregn padding og border i elementets bredde */
+    max-width: 100%; 
+    box-sizing: border-box; 
 }
 
 .question-separator input {
-    width: 100%; /* Sørg for, at input-felterne ikke overskrider containerens bredde */
-    box-sizing: border-box; /* Medregn padding og border i input-felternes bredde */
+    width: 100%; 
+    box-sizing: border-box; 
 }
 
 
 
-/* Responsivitet */
+
 @media (max-width: 768px) {
     header {
         font-size: 0.8em;
-        height: 50px; /* Reduceret højde for mindre skærme */
+        height: 50px; 
         flex-wrap: wrap;
     }
 
     #corner-logo {
-        width: 30px; /* Mindre logo for små skærme */
+        width: 30px; 
     }
 
     header h1 {

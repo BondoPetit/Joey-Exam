@@ -1,8 +1,7 @@
-// This script is responsible for handling employee login, fetching quizzes from the database, and displaying them for employees to take.
 document.addEventListener('DOMContentLoaded', async () => {
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
-        logoutButton.style.display = 'block'; // Ensure logout button is visible
+        logoutButton.style.display = 'block'; 
         logoutButton.addEventListener('click', async () => {
             try {
                 const response = await fetch('/employee/logout', {
@@ -26,15 +25,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const quizList = document.getElementById('quiz-list');
     const loggedInUserSpan = document.getElementById('logged-in-user');
-    let quizzes = []; // Declare quizzes variable to be used globally
+    let quizzes = []; // Laver en global variabel
 
-    // Check who is logged in
+    // Tjekker hvem er logget ind
     try {
         const response = await fetch('/employee/whoami', { credentials: 'include' });
         if (response.ok) {
             const result = await response.json();
             if (result.loggedIn && result.userType === 'employee') {
-                // Show the logged-in email
+                // Viser emailen til hvem er logget ind
                 loggedInUserSpan.textContent = `Logged in as: ${result.email}`;
             } else {
                 alert('You are not authorized to view this page. Please log in as an employee.');

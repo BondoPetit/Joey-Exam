@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Forhindre standard form submission
+            event.preventDefault(); 
 
             // Hent inputfelter
             const email = document.getElementById('email').value;
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (response.ok) {
                     const result = await response.json();
 
-                    // Log and save employeeId in sessionStorage
+                    // Gem employeeID i localStorage
                     if (result.employeeId) {
                         console.log('Employee ID received:', result.employeeId);
                         sessionStorage.setItem('employeeId', result.employeeId);

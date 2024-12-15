@@ -1,12 +1,11 @@
-// Import the required modules
 const express = require('express');
 const sql = require('mssql');
 const router = express.Router();
 const { getPool } = require('../../database');
 
-// Middleware to check if the user is authenticated as an admin
+// Tjekker hvis brugeren er admin
 function isAuthenticated(req, res, next) {
-    console.log('Session Info:', req.session); // Debugging for session information
+    console.log('Session Info:', req.session); // Debugging
     if (req.session && req.session.isAdmin && req.session.adminId) {
         return next();
     } else {
@@ -14,7 +13,7 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-// Route for getting all quizzes (accessible only to admin)
+// Admin adgang til quizzerne
 router.get('/quizzes', isAuthenticated, async (req, res) => {
     try {
         const pool = await getPool();
@@ -26,7 +25,7 @@ router.get('/quizzes', isAuthenticated, async (req, res) => {
     }
 });
 
-// Route for deleting a quiz (accessible only to admin)
+// Funktion til at slette en quiz
 router.delete('/quizzes/:quizId', isAuthenticated, async (req, res) => {
     const { quizId } = req.params;
     try {
@@ -39,7 +38,7 @@ router.delete('/quizzes/:quizId', isAuthenticated, async (req, res) => {
     }
 });
 
-// Route for updating a quiz (accessible only to admin)
+// Funktion for at ændre en quiz
 router.put('/quizzes/:quizId', isAuthenticated, async (req, res) => {
     const { quizId } = req.params;
     const { title } = req.body;
@@ -58,7 +57,7 @@ router.put('/quizzes/:quizId', isAuthenticated, async (req, res) => {
     }
 });
 
-// Route to check who is logged in (accessible to admin only)
+// Tjekker hvem er logget ind
 router.get('/whoami', isAuthenticated, async (req, res) => {
     try {
         const pool = await getPool();
@@ -78,7 +77,7 @@ router.get('/whoami', isAuthenticated, async (req, res) => {
     }
 });
 
-// Route to logout the user (accessible to admin only)
+// Logout funktion
 router.post('/logout', isAuthenticated, (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -88,5 +87,4 @@ router.post('/logout', isAuthenticated, (req, res) => {
     });
 });
 
-// Export the router to make the routes accessible from other modules
 module.exports = router;

@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then((data) => callback(data.country))
                 .catch(() => callback('us'));
         },
-        utilsScript: '/static/static/js/utils.js', // Ensure this path matches your server setup
+        utilsScript: '/static/static/js/utils.js', 
     });
 
     console.log("IntlTelInput initialized:", iti);
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     registerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        // Check if utils.js is loaded and intl-tel-input validation is available
+        // Tjekker hvis intlTelInputUtils er tilgængelig
         if (typeof intlTelInputUtils === "undefined") {
             alert("Phone number validation is not available. Please try again later.");
             return;
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const phoneNumber = iti.getNumber(); // Get the full E.164 formatted number
+        const phoneNumber = iti.getNumber(); 
         console.log("E.164 formatted phone number:", phoneNumber);
 
         try {
