@@ -1,8 +1,10 @@
-// This script is responsible for handling employee login, fetching quizzes from the database, and displaying them for employees to take.
 document.addEventListener('DOMContentLoaded', async () => {
     const logoutButton = document.getElementById('logout-button');
+    const viewHistoryButton = document.getElementById('view-history-button');
+    const historySection = document.getElementById('history-section');
+    const historyList = document.getElementById('history-list');
     if (logoutButton) {
-        logoutButton.style.display = 'block'; // Ensure logout button is visible
+        logoutButton.style.display = 'block'; 
         logoutButton.addEventListener('click', async () => {
             try {
                 const response = await fetch('/employee/logout', {
@@ -13,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     credentials: 'include'
                 });
                 if (response.ok) {
-                    window.location.href = '/static/views/employee_login.html';
+                    window.location.href = '/';
                 } else {
                     alert('Failed to log out. Please try again.');
                 }
@@ -26,38 +28,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const quizList = document.getElementById('quiz-list');
     const loggedInUserSpan = document.getElementById('logged-in-user');
-    let quizzes = []; // Declare quizzes variable to be used globally
+    let quizzes = []; // Laver en global variabel
 
-    // Check who is logged in
+    // Tjekker hvem er logget ind
     try {
         const response = await fetch('/employee/whoami', { credentials: 'include' });
         if (response.ok) {
             const result = await response.json();
             if (result.loggedIn && result.userType === 'employee') {
-                // Show the logged-in email
+                // Viser emailen til hvem er logget ind
                 loggedInUserSpan.textContent = `Logged in as: ${result.email}`;
             } else {
                 alert('You are not authorized to view this page. Please log in as an employee.');
-                // Redirect to login page
+                // Sender brugeren til loginsiden
                 window.location.href = `${window.location.origin}/static/views/employee_login.html`;
-                return; // Stop further script execution
+                return; 
             }
         } else {
             alert('Unable to verify login status. Please log in.');
-            // Redirect to login page
+            // Sender brugeren til loginsiden
             window.location.href = `${window.location.origin}/static/views/employee_login.html`;
-            return; // Stop further script execution
+            return; 
         }
     } catch (error) {
         console.error('Error checking login status:', error);
         alert('An error occurred while checking login status. Please log in.');
-        // Redirect to login page
+        // Sender brugeren til loginsiden
         window.location.href = `${window.location.origin}/static/views/employee_login.html`;
-        return; // Stop further script execution
+        return; 
     }
 
     try {
-        // Fetch quizzes from the server
+        // Henter quizzerne fra serveren
         const response = await fetch('/employee/get', { credentials: 'include' });
         if (!response.ok) {
             throw new Error('Failed to fetch quizzes from the server');
@@ -75,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         quizList.innerHTML = '<p>Error fetching quizzes. Please try again later.</p>';
     }
 
-    // Function to handle quiz taking
+    // Funktion til at tage en quiz
     window.startQuiz = async function (quizID) {
         try {
             const response = await fetch(`/employee/get/${quizID}`, { credentials: 'include' });
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 quizContainer.appendChild(questionDiv);
             });
 
-            // Create button container and buttons
+            // Laver containers til knapperne, og knapperne
             const buttonContainer = document.createElement('div');
             buttonContainer.classList.add('button-container');
 
@@ -123,7 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             submitButton.textContent = 'Submit Quiz';
             submitButton.classList.add('submit-quiz');
             submitButton.onclick = async () => {
-                // Gather results from the quiz
+                // Fjerner gammel feedback (Hvis det eksisterer)
+                const oldFeedbacks = quizContainer.querySelectorAll('.feedback');
+                oldFeedbacks.forEach(feedback => feedback.remove());
+                
+                
                 const employeeAnswers = [];
                 quiz.questions.forEach((question, qIndex) => {
                     const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
@@ -133,23 +139,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                         correctAnswer: question.answers.find(answer => answer.isCorrect).text
                     });
                 });
-
-                // Retrieve employeeId from session storage
+            
                 const employeeId = sessionStorage.getItem('employeeId');
                 if (!employeeId) {
                     alert('No employee ID found. Please log in again.');
                     return;
                 }
-
-                // Create result object
+            
                 const result = {
-                    quizID: quiz.quizID, // Include quizID here
+                    quizID: quiz.quizID, 
                     title: quiz.title,
                     employeeId: employeeId,
                     questions: employeeAnswers
                 };
-
-                // Send the result to the server to save in the database
+            
                 try {
                     const response = await fetch('/employee/submit', {
                         credentials: 'include',
@@ -159,15 +162,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                         },
                         body: JSON.stringify(result)
                     });
-
+            
                     if (response.ok) {
-                        // Show feedback after submission
+                        // Vise ny feedback
                         quiz.questions.forEach((question, qIndex) => {
                             const selectedAnswer = document.querySelector(`input[name="question-${qIndex}"]:checked`);
                             const questionDiv = document.querySelectorAll('.question')[qIndex];
                             const feedbackDiv = document.createElement('div');
                             feedbackDiv.classList.add('feedback');
-
+            
                             if (selectedAnswer && selectedAnswer.value === question.answers.find(answer => answer.isCorrect).text) {
                                 feedbackDiv.classList.add('correct');
                                 feedbackDiv.innerText = 'Correct!';
@@ -175,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 feedbackDiv.classList.add('incorrect');
                                 feedbackDiv.innerText = 'Incorrect!';
                             }
-
+            
                             questionDiv.appendChild(feedbackDiv);
                         });
                         alert('Quiz submitted successfully!');
@@ -189,10 +192,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     alert('An error occurred while submitting the quiz.');
                 }
             };
+            
 
             buttonContainer.appendChild(submitButton);
 
-            // Append button container after questions
             quizContainer.appendChild(buttonContainer);
 
             quizList.innerHTML = '';
@@ -203,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Function to reload available quizzes
+    // Reloader quizzerne
     function loadAvailableQuizzes() {
         quizList.innerHTML = '';
         quizzes.forEach((quiz) => {
@@ -211,15 +214,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             quizDiv.classList.add('quiz');
             quizDiv.style.position = 'relative';
 
-            // Add status icon to indicate if the quiz is completed
+            // Status ikon til at vise om quizzen er taget eller ej
             const statusIcon = document.createElement('div');
             statusIcon.classList.add('status-icon');
             if (quiz.completed) {
-                statusIcon.innerHTML = '&#x2714;'; // Green checkmark symbol
+                statusIcon.innerHTML = '&#x2714;'; // Green checkmark 
                 statusIcon.style.backgroundColor = 'green';
                 statusIcon.style.color = 'white';
             } else {
-                statusIcon.innerHTML = '&#x25CB;'; // Circle symbol
+                statusIcon.innerHTML = '&#x25CB;'; // Cirkel symbol
                 statusIcon.style.color = 'grey';
             }
             statusIcon.style.position = 'absolute';
@@ -240,4 +243,65 @@ document.addEventListener('DOMContentLoaded', async () => {
             quizList.appendChild(quizDiv);
         });
     }
+    viewHistoryButton.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/employee/history', { credentials: 'include' });
+            if (!response.ok) {
+                if (response.status === 401) {
+                    alert('You must be logged in as an employee to view your quiz history.');
+                    return;
+                }
+                throw new Error('Error fetching quiz history from the server');
+            }
+
+            const quizHistory = await response.json();
+
+            // Fjerner historik
+            historyList.innerHTML = '';
+
+            if (!Array.isArray(quizHistory) || quizHistory.length === 0) {
+                historyList.innerHTML = '<p>You have no quiz history yet.</p>';
+            } else {
+                quizHistory.forEach((quiz) => {
+                    const quizDiv = document.createElement('div');
+                    quizDiv.classList.add('quiz-history-result');
+                    quizDiv.innerHTML = `
+                        <h3>Quiz: ${quiz.title}</h3>
+                        <button class="toggle-employee-history-button">Show My Answers</button>
+                        <div class="employee-quiz-results hidden"></div>
+                    `;
+
+                    const resultsContainer = quizDiv.querySelector('.employee-quiz-results');
+                    
+                    quiz.employeeSummaries.forEach((result) => {
+                        
+                        const resultDiv = document.createElement('div');
+                        resultDiv.classList.add('employee-summary');
+                        resultDiv.innerHTML = `
+                            <p><strong>Your Employee ID:</strong> ${result.employeeId}</p>
+                            <p><strong>Incorrect Answers Count:</strong> ${result.incorrectCount}</p>
+                        `;
+                        resultsContainer.appendChild(resultDiv);
+                    });
+
+                    const toggleButton = quizDiv.querySelector('.toggle-employee-history-button');
+                    toggleButton.addEventListener('click', () => {
+                        resultsContainer.classList.toggle('hidden');
+                        toggleButton.textContent = resultsContainer.classList.contains('hidden') 
+                            ? 'Show My Answers' 
+                            : 'Hide My Answers';
+                    });
+
+                    historyList.appendChild(quizDiv);
+                });
+            }
+
+            // Vise historik
+            historySection.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error fetching quiz history:', error);
+            historyList.innerHTML = '<p>Error fetching quiz history. Please try again later.</p>';
+            historySection.classList.remove('hidden');
+        }
+    });
 });

@@ -3,14 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Forhindrer standard form submission
+            event.preventDefault(); 
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
             try {
-                console.log('Attempting to send login request with:', { username, password });
-
                 // Send en POST-anmodning til serveren for login
                 const response = await fetch('/admin_login/login', {
                     method: 'POST',

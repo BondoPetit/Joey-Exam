@@ -3,33 +3,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loggedInUserSpan = document.getElementById('logged-in-user');
     const logoutButton = document.getElementById('logout-button');
 
-    // Check login status
+    // Tjekker login status
     try {
         const response = await fetch('/admin/whoami');
         if (response.ok) {
             const result = await response.json();
             if (result.loggedIn && result.userType === 'admin') {
-                // Show logged-in username
+                // Viser brugernavnet for den der er logget ind
                 loggedInUserSpan.textContent = `Logged in as: ${result.username}`;
                 logoutButton.style.display = 'block';
             } else {
                 alert('You are not authorized to view this page. Please log in as an admin.');
                 window.location.href = `${window.location.origin}/Static/views/admin_login.html`;
-                return; // Stop further execution
+                return; 
             }
         } else {
             alert('Unable to verify login status. Please log in.');
             window.location.href = `${window.location.origin}/Static/views/admin_login.html`;
-            return; // Stop further execution
+            return; 
         }
     } catch (error) {
         console.error('Error checking login status:', error);
         alert('An error occurred while checking login status. Please log in.');
         window.location.href = `${window.location.origin}/Static/views/admin_login.html`;
-        return; // Stop further execution
+        return; 
     }
 
-    // Handle logout button
+    // Logout knap
     logoutButton.addEventListener('click', async () => {
         try {
             const response = await fetch('/admin/logout', {
@@ -49,9 +49,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Fetch quiz results
+    // Henter quizresultater
     try {
-        const response = await fetch('/results'); // Updated URL to be relative
+        const response = await fetch('/results'); // Opdaterer URL
         if (response.status === 401) {
             resultsList.innerHTML = '<p>You must be logged in as an admin to view quiz results.</p>';
             return;
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const quizResults = await response.json();
 
-        // Check if quizResults is an array
+        // Tjekker hvis quizresultaterne er tomme
         if (!Array.isArray(quizResults) || quizResults.length === 0) {
             resultsList.innerHTML = '<p>No quiz results available at the moment.</p>';
             return;
@@ -88,10 +88,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const resultDiv = document.createElement('div');
                 resultDiv.classList.add('employee-summary');
                 resultDiv.innerHTML = `
-                    <p><strong>Submitted by Employee ID:</strong> ${result.employeeId}</p>
+                    <p><strong>Submitted by:</strong> ${result.employeeEmail}</p>
                     <p><strong>Incorrect Answers Count:</strong> ${result.incorrectCount}</p>
                 `;
-
+            
                 resultsContainer.appendChild(resultDiv);
             });
 

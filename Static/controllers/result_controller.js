@@ -1,11 +1,9 @@
-// New result controller file: result_controller.js
-
 const express = require('express');
 const sql = require('mssql');
 const router = express.Router();
 const { getPool } = require('../../database');
 
-// Middleware to check if the user is authenticated
+// Tjekker hvis brugeren er authentificeret
 function isAuthenticated(req, res, next) {
     if (req.session && req.session.isAdmin) {
         return next();
@@ -14,21 +12,22 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-// Route for fetching all quiz results and statistics
-router.get('/', isAuthenticated, async (req, res) => {  // Middleware applied here
+// Route til at fetche quizresultater og statistikker
+router.get('/', isAuthenticated, async (req, res) => {
     try {
         const pool = await getPool();
         const resultsQuery = await pool.request().query(`
-            SELECT r.ResultID, r.Title, r.EmployeeID, ea.QuestionText, ea.EmployeeAnswer, ea.CorrectAnswer
+            SELECT r.ResultID, r.Title, e.EmployeeEmail, ea.QuestionText, ea.EmployeeAnswer, ea.CorrectAnswer
             FROM EmployeeResults r
             LEFT JOIN EmployeeAnswers ea ON r.ResultID = ea.ResultID
+            LEFT JOIN Employees e ON r.EmployeeID = e.EmployeeID
             ORDER BY r.Title, r.ResultID
         `);
 
         const rawResults = resultsQuery.recordset;
         const formattedResults = {};
 
-        // Group results by Quiz Title
+        // Grupperer resultater efter quiz og medarbejder
         rawResults.forEach(row => {
             if (!formattedResults[row.Title]) {
                 formattedResults[row.Title] = {
@@ -38,18 +37,18 @@ router.get('/', isAuthenticated, async (req, res) => {  // Middleware applied he
             }
 
             let currentQuiz = formattedResults[row.Title];
-            let existingResult = currentQuiz.results.find(result => result.employeeId === row.EmployeeID);
+            let existingResult = currentQuiz.results.find(result => result.employeeEmail === row.EmployeeEmail);
 
             if (!existingResult) {
                 existingResult = {
-                    employeeId: row.EmployeeID,
+                    employeeEmail: row.EmployeeEmail,
                     questions: [],
                     incorrectCount: 0,
                 };
                 currentQuiz.results.push(existingResult);
             }
 
-            // Push question details
+            // Tilføjer spørgsmål
             const isCorrect = row.EmployeeAnswer === row.CorrectAnswer;
             existingResult.questions.push({
                 text: row.QuestionText,
@@ -62,13 +61,13 @@ router.get('/', isAuthenticated, async (req, res) => {  // Middleware applied he
             }
         });
 
-        // Flatten results into an array for each quiz
+        // Formatterer som en array
         const results = Object.values(formattedResults).map(quiz => {
             return {
                 title: quiz.title,
                 employeeSummaries: quiz.results.map(result => {
                     return {
-                        employeeId: result.employeeId,
+                        employeeEmail: result.employeeEmail,
                         incorrectCount: result.incorrectCount
                     };
                 })
@@ -82,8 +81,9 @@ router.get('/', isAuthenticated, async (req, res) => {  // Middleware applied he
     }
 });
 
-// Route for fetching detailed quiz results for a specific quiz and employee
-router.get('/:quizTitle/:employeeId', isAuthenticated, async (req, res) => {  // Middleware applied here
+
+// Henter specifikke resultater for et bestemt quiz og medarbejder
+router.get('/:quizTitle/:employeeId', isAuthenticated, async (req, res) => {  
     const { quizTitle, employeeId } = req.params;
     try {
         const pool = await getPool();

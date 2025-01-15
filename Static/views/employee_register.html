@@ -4,30 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Joe & the Juice - Team Player Register</title>
+    <link rel="stylesheet" href="/static/intl-tel-input/css/intlTelInput.css">
     <link rel="stylesheet" href="/static/public/css/employee_register.css">
     <link rel="icon" type="image/png" href="/static/public/pictures/favicon.png">
 </head>
 <body>
+    <header>
+        <img id="corner-logo" src="/static/public/pictures/logo.png" alt="Joe & The Juice Logo">
+        <h1>Joe Team</h1>
+    </header>
     <main>
-        <h1>Team Player Register</h1>
-        <form id="employee-register-form">
-            <label for="email">Email:</label>
-            <input type="text" id="email" name="email" required>
-            
-            <label for="phone-number">Phone Number:</label>
-            <input type="tel" id="phone-number" name="phone-number" required>
-            
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            
-            <label for="confirm-password">Confirm Password:</label>
-            <input type="password" id="confirm-password" name="confirm-password" required>
-            
-            <button type="submit">Register</button>
-        </form>
-        <p>Already have an account? <a href="employee_login.html">Login here</a></p>
+        <div class="register-container">
+            <h2>Team Player Register</h2>
+            <form id="employee-register-form">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" required>
+
+                <label for="phone-number">Phone Number:</label>
+                <input type="tel" id="phone-number" name="phone-number" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <label for="confirm-password">Confirm Password:</label>
+                <input type="password" id="confirm-password" name="confirm-password" required>
+
+                <button type="submit">Register</button>
+            </form>
+            <p>Already have an account? <a href="employee_login.html">Login here</a></p>
+        </div>
     </main>
+    <script type="module" src="/static/public/js/utils.js"></script>
+    <script src="/static/public/js/intlTelInput.min.js"></script>
     <script src="/static/public/js/employee_register.js"></script>
-    <script src="/Static/public/js/cookie.js"></script>
 </body>
 </html>

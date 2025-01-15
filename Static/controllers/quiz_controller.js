@@ -1,10 +1,9 @@
-// Import the required modules
 const express = require('express');
 const sql = require('mssql');
 const router = express.Router();
 const { getPool } = require('../../database');
 
-// Middleware to check if the user is authenticated
+// Tjekker hvis brugeren er authentificeret
 function isAuthenticated(req, res, next) {
     if (req.session && req.session.isAdmin) {
         return next();
@@ -13,7 +12,7 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-// Route for saving a new quiz, accessible only if authenticated
+// Route til at gemme quizzen
 router.post('/save', isAuthenticated, async (req, res) => {
     const { title, questions } = req.body;
 
@@ -23,10 +22,10 @@ router.post('/save', isAuthenticated, async (req, res) => {
 
     try {
         const pool = await getPool();
-        const transaction = new sql.Transaction(pool); // Initialize transaction
+        const transaction = new sql.Transaction(pool); 
         await transaction.begin();
 
-        // Insert quiz into the Quizzes table
+        // Sætter quizzen ind i quiz tabellen
         const quizRequest = new sql.Request(transaction);
         const quizResult = await quizRequest
             .input('title', sql.NVarChar, title)
@@ -38,7 +37,7 @@ router.post('/save', isAuthenticated, async (req, res) => {
 
         const quizID = quizResult.recordset[0].QuizID;
 
-        // Insert questions into the Questions table
+        // Sætter spørgsmålene ind i Questions tabellen
         for (let i = 0; i < questions.length; i++) {
             const question = questions[i];
 
@@ -54,7 +53,7 @@ router.post('/save', isAuthenticated, async (req, res) => {
 
             const questionID = questionResult.recordset[0].QuestionID;
 
-            // Insert answers into the Answers table
+            // Sætter svarene i svartabellen
             for (let j = 0; j < question.answers.length; j++) {
                 const answerText = question.answers[j];
                 const isCorrect = parseInt(question.correctAnswer, 10) === (j + 1);
@@ -85,5 +84,4 @@ router.post('/save', isAuthenticated, async (req, res) => {
     }
 });
 
-// Export the router to make the routes accessible from other modules
 module.exports = router;

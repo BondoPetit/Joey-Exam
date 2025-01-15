@@ -1,108 +1,118 @@
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('employee-register-form');
-    console.log('Register Form:', registerForm); // Tjekker om registerForm findes
+    const phoneNumberInput = document.getElementById('phone-number');
 
-    if (registerForm) {
-        registerForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Forhindrer standard form submission
-            
-            // Få fat i inputfelter ved hjælp af deres ID'er og log dem
-            const emailField = document.getElementById('email');
-            const phoneNumberField = document.getElementById('phone-number');
-            const passwordField = document.getElementById('password');
-            const confirmPasswordField = document.getElementById('confirm-password');
+    if (!phoneNumberInput) {
+        console.error("Phone number input field not found!");
+        return;
+    }
 
-            console.log('Email Field:', emailField);
-            console.log('Phone Number Field:', phoneNumberField);
-            console.log('Password Field:', passwordField);
-            console.log('Confirm Password Field:', confirmPasswordField);
+    // Initialize intl-tel-input
+    const iti = window.intlTelInput(phoneNumberInput, {
+        initialCountry: 'auto',
+        geoIpLookup: (callback) => {
+            fetch('https://ipinfo.io?token=a085c8e14684e6')
+                .then((resp) => resp.json())
+                .then((data) => callback(data.country))
+                .catch(() => callback('us'));
+        },
+        utilsScript: '/static/static/js/utils.js', 
+    });
 
-            if (!emailField || !phoneNumberField || !passwordField || !confirmPasswordField) {
-                alert('One or more fields are missing.');
-                return;
-            }
+    console.log("IntlTelInput initialized:", iti);
 
-            const email = emailField.value;
-            const phoneNumber = phoneNumberField.value;
-            const password = passwordField.value;
-            const confirmPassword = confirmPasswordField.value;
+    registerForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-            if (password !== confirmPassword) {
-                alert('Passwords do not match!');
-                return;
-            }
+        // Tjekker hvis intlTelInputUtils er tilgængelig
+        if (typeof intlTelInputUtils === "undefined") {
+            alert("Phone number validation is not available. Please try again later.");
+            return;
+        }
 
-            try {
-                // Send POST request til serveren for at sende en verificeringskode via SMS
-                const verificationResponse = await fetch('/employee_login/send-verification-code', {
+        const emailField = document.getElementById('email');
+        const passwordField = document.getElementById('password');
+        const confirmPasswordField = document.getElementById('confirm-password');
+
+        const email = emailField.value.trim();
+        const password = passwordField.value;
+        const confirmPassword = confirmPasswordField.value;
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match!');
+            return;
+        }
+
+        if (!iti.isValidNumber()) {
+            console.error("Validation failed. Error code:", iti.getValidationError());
+            const errorMessages = {
+                1: "Invalid country code.",
+                2: "Number is too short.",
+                3: "Number is too long.",
+                4: "Invalid number format.",
+            };
+            alert(errorMessages[iti.getValidationError()] || "Invalid phone number.");
+            return;
+        }
+
+        const phoneNumber = iti.getNumber(); 
+        console.log("E.164 formatted phone number:", phoneNumber);
+
+        try {
+            const verificationResponse = await fetch('/employee_login/send-verification-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ phoneNumber }),
+            });
+
+            if (verificationResponse.ok) {
+                const verificationCode = prompt('A verification code has been sent to your phone. Please enter the code:');
+                if (!verificationCode) {
+                    alert('Verification code is required.');
+                    return;
+                }
+
+                const verifyCodeResponse = await fetch('/employee_login/verify-code', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ phoneNumber }),
+                    body: JSON.stringify({ phoneNumber, verificationCode }),
                 });
 
-                if (verificationResponse.ok) {
-                    const verificationCode = prompt('A verification code has been sent to your phone. Please enter the code:');
-                    if (!verificationCode) {
-                        alert('Verification code is required.');
-                        return;
+                if (!verifyCodeResponse.ok) {
+                    alert('Invalid verification code. Please try again.');
+                    return;
+                }
+
+                const response = await fetch('/employee_login/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, phoneNumber, password }),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.employeeId) {
+                        sessionStorage.setItem('employeeId', result.employeeId);
                     }
-
-                    // Send POST request til serveren for at bekræfte verificeringskoden
-                    const verifyCodeResponse = await fetch('/employee_login/verify-code', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ phoneNumber, verificationCode }),
-                    });
-
-                    if (!verifyCodeResponse.ok) {
-                        alert('Invalid verification code. Please try again.');
-                        return;
-                    }
-
-                    // Send POST request til serveren for at registrere medarbejderen
-                    const response = await fetch('/employee_login/register', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email, phoneNumber, password }),
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-
-                        // Log og gem employeeId i sessionStorage ligesom i login-processen
-                        if (result.employeeId) {
-                            console.log('Employee ID received:', result.employeeId);
-                            sessionStorage.setItem('employeeId', result.employeeId);
-                            console.log('Employee ID saved in sessionStorage');
-                        } else {
-                            console.error('No employeeId found in the response');
-                        }
-
-                        if (result.redirectUrl) {
-                            window.location.href = result.redirectUrl; // Redirect til employee dashboard
-                        }
-                    } else {
-                        const contentType = response.headers.get("content-type");
-                        if (contentType && contentType.indexOf("application/json") !== -1) {
-                            const errorData = await response.json();
-                            alert(errorData.error || 'An error occurred while registering.');
-                        } else {
-                            alert('An error occurred: ' + response.statusText);
-                        }
+                    if (result.redirectUrl) {
+                        window.location.href = result.redirectUrl;
                     }
                 } else {
-                    alert('Failed to send verification code. Please try again.');
+                    const errorData = await response.json();
+                    alert(errorData.error || 'An error occurred while registering.');
                 }
-            } catch (error) {
-                console.error('Error during registration:', error);
-                alert('An error occurred while registering.');
+            } else {
+                alert('Failed to send verification code. Please try again.');
             }
-        });
-    }
+        } catch (error) {
+            console.error('Error during registration:', error);
+            alert('An error occurred while registering.');
+        }
+    });
 });

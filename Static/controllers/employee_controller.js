@@ -1,12 +1,11 @@
-// Import the required modules
 const express = require('express');
 const sql = require('mssql');
 const router = express.Router();
 const { getPool } = require('../../database');
 
-// Middleware to check if the user is authenticated as an employee
+// Tjekker hvis brugeren er authentificeret
 function isAuthenticated(req, res, next) {
-    console.log('Session Info:', req.session); // Debugging for session information
+    console.log('Session Info:', req.session); // Debugging
     if (req.session && req.session.isEmployee && req.session.employeeId) {
         return next();
     } else {
@@ -14,44 +13,8 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-// Route for handling employee login
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required.' });
-    }
-    try {
-        const pool = await getPool();
-        const result = await pool.request()
-            .input('email', sql.NVarChar, email)
-            .query(`
-                SELECT EmployeeID, EmployeePassword
-                FROM Employees
-                WHERE EmployeeEmail = @email
-            `);
 
-        if (result.recordset.length === 0) {
-            return res.status(401).json({ error: 'Invalid credentials.' });
-        }
-
-        const { EmployeeID, EmployeePassword: storedPassword } = result.recordset[0];
-        if (storedPassword !== password) { // Use a proper hashing method like bcrypt in production
-            return res.status(401).json({ error: 'Invalid credentials.' });
-        }
-
-        // Update session to store that the user is an employee
-        req.session.isEmployee = true;
-        req.session.employeeId = EmployeeID;
-        req.session.employeeEmail = email;
-
-        res.status(200).json({ message: 'Login successful', employeeId: EmployeeID, redirectUrl: '/static/views/employee.html' });
-    } catch (err) {
-        console.error('Error logging in employee:', err.message);
-        res.status(500).json({ error: 'An error occurred while logging in.' });
-    }
-});
-
-// Route for fetching all quizzes for employees
+// Finder frem quizzene til medarbejderne
 router.get('/get', isAuthenticated, async (req, res) => {
     console.log('GET /employee/get endpoint hit');
     try {
@@ -103,7 +66,7 @@ router.get('/get', isAuthenticated, async (req, res) => {
     }
 });
 
-// Route for fetching a specific quiz by ID
+// Finder quiz via dens ID
 router.get('/get/:id', isAuthenticated, async (req, res) => {
     const quizID = parseInt(req.params.id, 10);
     if (isNaN(quizID)) {
@@ -162,7 +125,7 @@ router.get('/get/:id', isAuthenticated, async (req, res) => {
     }
 });
 
-// Route for saving or updating employee quiz answers
+// Gemmer og opdaterer quiz svar
 router.post('/submit', isAuthenticated, async (req, res) => {
     console.log('POST /employee/submit endpoint hit');
     const employeeId = req.session.employeeId;
@@ -233,7 +196,7 @@ router.post('/submit', isAuthenticated, async (req, res) => {
     }
 });
 
-// Route to logout employee
+// Logger medarbejderne ud
 router.post('/logout', isAuthenticated, (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -243,7 +206,7 @@ router.post('/logout', isAuthenticated, (req, res) => {
     });
 });
 
-// Route to check who is logged in
+// Tjekker hvem er logget ind
 router.get('/whoami', isAuthenticated, (req, res) => {
     if (req.session && req.session.isEmployee) {
         res.status(200).json({
@@ -256,5 +219,78 @@ router.get('/whoami', isAuthenticated, (req, res) => {
     }
 });
 
-// Export the router
+// Kode for at vise quiz historik
+router.get('/history', isAuthenticated, async (req, res) => {
+    const employeeId = req.session.employeeId; 
+    try {
+        const pool = await getPool();
+
+        const resultsQuery = await pool.request()
+            .input('employeeId', sql.Int, employeeId) 
+            .query(`
+            SELECT r.ResultID, r.Title, r.EmployeeID, ea.QuestionText, ea.EmployeeAnswer, ea.CorrectAnswer
+            FROM EmployeeResults r
+            LEFT JOIN EmployeeAnswers ea ON r.ResultID = ea.ResultID
+            WHERE r.EmployeeID = @employeeId
+            ORDER BY r.Title, r.ResultID
+    `       );
+
+        const rawResults = resultsQuery.recordset;
+        if (rawResults.length === 0) {
+            // Hvis der ikke er nogen resultater, returneres en tom liste
+            return res.status(200).json([]);
+        }
+
+        // Formatterer resultaterne
+        const formattedResults = {};
+        rawResults.forEach(row => {
+            if (!formattedResults[row.Title]) {
+                formattedResults[row.Title] = {
+                    title: row.Title,
+                    results: [],
+                };
+            }
+
+            let currentQuiz = formattedResults[row.Title];
+            let existingResult = currentQuiz.results.find(result => result.employeeId === row.EmployeeID);
+
+            if (!existingResult) {
+                existingResult = {
+                    employeeId: row.EmployeeID,
+                    questions: [],
+                    incorrectCount: 0,
+                };
+                currentQuiz.results.push(existingResult);
+            }
+
+            const isCorrect = row.EmployeeAnswer === row.CorrectAnswer;
+            existingResult.questions.push({
+                text: row.QuestionText,
+                employeeAnswer: row.EmployeeAnswer,
+                correctAnswer: row.CorrectAnswer,
+                isCorrect
+            });
+            if (!isCorrect) {
+                existingResult.incorrectCount++;
+            }
+        });
+
+        // Laver results ind til en array
+        const results = Object.values(formattedResults).map(quiz => {
+            return {
+                title: quiz.title,
+                employeeSummaries: quiz.results.map(result => ({
+                    employeeId: result.employeeId,
+                    incorrectCount: result.incorrectCount
+                }))
+            };
+        });
+
+        res.status(200).json(results);
+    } catch (err) {
+        console.error('Error fetching employee quiz history:', err.message);
+        res.status(500).json({ error: 'An error occurred while fetching your quiz history.' });
+    }
+});
+
 module.exports = router;

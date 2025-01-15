@@ -1,16 +1,15 @@
-// Import the required modules
 const express = require('express');
 const sql = require('mssql');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const { getPool } = require('../../database');
 
-// Route for handling admin login
+// Funktion til admin login
 router.post('/login', async (req, res) => {
-    console.log('Received POST request to /admin_login/login'); // Log to verify request receipt
+    console.log('Received POST request to /admin_login/login'); // Logger requesten til debugging
     const { username, password } = req.body;
     if (!username || !password) {
-        console.log('Missing username or password'); // Log to clarify missing fields
+        console.log('Missing username or password'); // Log til debugging
         return res.status(400).json({ error: 'Username and password are required.' });
     }
     try {
@@ -32,16 +31,16 @@ router.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, hashedPassword);
         
         if (isPasswordValid) {
-            console.log('Login successful for user:', username); // Log successful login
+            console.log('Login successful for user:', username); 
             
-            // Update session to store that the user is an admin
+            // Opdaterer session med admin data
             req.session.isAdmin = true;
-            req.session.adminId = AdminID; // Ensure consistency in variable naming
+            req.session.adminId = AdminID; 
 
             res.status(200).json({ 
                 message: 'Login successful',
-                adminId: AdminID, // Send AdminID back to the client if needed
-                redirectUrl: '/static/views/admin.html' // Updated redirect URL
+                adminId: AdminID, 
+                redirectUrl: '/static/views/admin.html' // Ny redirect URL
             });
         } else {
             console.error('Login failed: Invalid password for username:', username);
@@ -53,5 +52,4 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Export the router to make the routes accessible from other modules
 module.exports = router;

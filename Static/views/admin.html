@@ -6,17 +6,18 @@
     <title>Joe Admin - Quiz Creator</title>
     <link rel="stylesheet" href="/static/public/css/admin.css">
     <link rel="icon" type="image/png" href="/static/public/pictures/favicon.png">
+    <link rel="preload" href="/static/public/pictures/front.jpg" as="image">
 </head>
 <body>
     <header>
         <img id="corner-logo" src="/static/public/pictures/logo.png" alt="Joe & The Juice Logo">
         <h1>Joe & the Juice - Skill Check</h1>
-        <div id="nav-links">
+        <nav id="nav-links">
             <ul>
                 <li><a href="/Static/views/quiz_all.html">Quiz All</a></li>
                 <li><a href="/Static/views/result.html">Quiz Results</a></li>
             </ul>
-        </div>
+        </nav>
         <div id="user-info">
             <span id="logged-in-user">Logged in as:</span>
             <button id="logout-button">Logout</button>
@@ -24,7 +25,7 @@
     </header>
     <main>
         <button id="toggle-quiz-button">Show Quiz Creator</button>
-        <section id="create-quiz"> <!-- Removed inline style -->
+        <section id="create-quiz">
             <h2>Create a New Quiz</h2>
             <form id="quiz-form">
                 <label for="quiz-title">Quiz Title:</label>
@@ -34,13 +35,13 @@
                     <h3>Questions</h3>
                     <div class="question question-separator" data-question-id="1">
                         <label for="question-1">Question 1:</label>
-                        <input type="text" id="question-1" name="question-1" required placeholder="Be creative">
+                        <input type="text" id="question-1" name="question-1" required placeholder="Enter your question">
                         <label for="answer-1-1">Answer 1:</label>
-                        <input type="text" id="answer-1-1" name="answer-1-1" required placeholder="Be better">
+                        <input type="text" id="answer-1-1" name="answer-1-1" required placeholder="Option 1">
                         <label for="answer-1-2">Answer 2:</label>
-                        <input type="text" id="answer-1-2" name="answer-1-2" required placeholder="Be a Bee or Bee not">
+                        <input type="text" id="answer-1-2" name="answer-1-2" required placeholder="Option 2">
                         <label for="answer-1-3">Answer 3:</label>
-                        <input type="text" id="answer-1-3" name="answer-1-3" required placeholder="Bzzzz">
+                        <input type="text" id="answer-1-3" name="answer-1-3" required placeholder="Option 3">
                         <label for="correct-answer-1">Correct Answer:</label>
                         <input type="number" id="correct-answer-1" name="correct-answer-1" min="1" max="3" required>
                     </div>
@@ -51,6 +52,5 @@
         </section>
     </main>
     <script src="/static/public/js/admin.js"></script>
-    <script src="/Static/public/js/cookie.js"></script>
 </body>
 </html>

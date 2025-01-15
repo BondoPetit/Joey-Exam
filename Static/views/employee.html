@@ -10,7 +10,7 @@
 <body>
     <header>
         <img id="corner-logo" src="/static/public/pictures/logo.png" alt="Joe & The Juice Logo">
-        <h1>Joe & the Juice - Skill Check</h1>
+        <h1>Juicer - Training Dashboard</h1>
         <div id="user-info">
             <span id="logged-in-user"><!-- User email --></span>
             <button id="logout-button">Logout</button>
@@ -20,13 +20,15 @@
     <main>
         <section id="available-quizzes">
             <h2>Available Quizzes</h2>
-            <div id="quiz-list">
-                <!-- Quizzes created by admin will be listed here -->
+            <div id="quiz-list"></div>
+            <button id="view-history-button">View My Quiz History</button>
+            <div id="history-section" class="hidden">
+                <h2>My Quiz History</h2>
+                <div id="history-list"></div>
             </div>
         </section>
     </main>
 
     <script src="/static/public/js/employee.js"></script>
-    <script src="/Static/public/js/cookie.js"></script>
 </body>
 </html>
